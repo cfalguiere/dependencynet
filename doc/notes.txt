@@ -1,0 +1,22 @@
+# prerequis
+pip install -r build-requirements.txt
+
+https://packaging.python.org/tutorials/packaging-projects/
+https://test.pypi.org/help/#apitoken
+
+# build distrib
+python setup.py sdist bdist_wheel
+
+# check pour pypi
+twine check dist/*
+
+# upload de test
+twine upload --repository-url  https://test.pypi.org/legacy/ dist/*
+
+https://test.pypi.org/project/dependencynet/
+
+# upload effectif
+twine upload dist/*
+
+# install pour test bout en bout
+pip install dependencynet
