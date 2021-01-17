@@ -11,12 +11,13 @@ python setup.py sdist bdist_wheel
 twine check dist/*
 
 # upload de test
-twine upload --repository-url  https://test.pypi.org/legacy/ dist/*
+twine upload --repository testpypi dist/*
+# add repository = https://test.pypi.org/legacy/ to .pypirc in section testpypi
 
 https://test.pypi.org/project/dependencynet/
 
 # upload effectif
-twine upload dist/*
+twine upload --repository pypi dist/*
 
 # install pour test bout en bout
 pip install dependencynet
