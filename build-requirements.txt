@@ -1,2 +1,4 @@
 nox==2020.12.31
 twine
+
+jupyter

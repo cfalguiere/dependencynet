@@ -6,7 +6,7 @@
 # third party import
 import pytest
 
-# skoobpy import
+# module import
 from dependencynet.utils import dummy
 
 

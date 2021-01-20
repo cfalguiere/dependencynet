@@ -23,5 +23,5 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.7',
 )
