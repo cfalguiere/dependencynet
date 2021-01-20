@@ -6,7 +6,7 @@ with open('README.md', 'r', encoding='utf-8') as file:
 setup(
     name='dependencynet',
     packages=find_packages(include=['dependencynet']),
-    version='0.0.1',
+    version='0.0.3',
     description='represent and analyse dependency graphs (networks)',
     long_description=long_description,
     long_description_content_type='text/markdown',

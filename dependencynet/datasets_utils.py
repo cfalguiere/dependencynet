@@ -1,9 +1,10 @@
 """
 This modukle provides helpers to buimd the source datasets of the graph
 """
+import os
+import logging
 
 import pandas as pd
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -80,3 +81,10 @@ def extract_hierarchy(df, keys, marks):
         dfs.append(df_i)
         df_parent = df_i
     return dfs
+
+
+def write_dataset(df, folder_name, dataset_name, sep=","):
+    os.makedirs(folder_name, exist_ok=True)
+    filename = os.path.join(folder_name, '%s.csv' % dataset_name)
+    df.to_csv(filename, sep=sep, index=False)
+    logger.info("dateset saved under name %s", filename)
