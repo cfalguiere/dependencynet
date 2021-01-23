@@ -16,7 +16,7 @@ def logger():
 
 
 @pytest.fixture
-def source_dataset():
+def source_data():
     data = {'process':  ['X', 'Y', 'Y', 'Y', 'Z', 'Z'],
             'step': ['load data', 'load data', 'load data', 'aggregate', 'load data', 'aggregate', ],
             'task': ['read file', 'read file', 'parse file', 'average', 'read csv', 'sum']
@@ -28,10 +28,10 @@ def source_dataset():
 
 
 # Tests
-def test_extract_hierarchy(source_dataset, logger):
+def test_extract_hierarchy(source_data, logger):
     keys = ['process', 'step', 'task']
     marks = "PST"
-    dfs = extract_hierarchy(source_dataset, keys, marks)
+    dfs = extract_hierarchy(source_data, keys, marks)
 
     assert len(dfs) == 3
 
