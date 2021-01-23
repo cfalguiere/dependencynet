@@ -57,3 +57,43 @@ def test_extract_hierarchy(source_data, logger):
     assert dfs[2]['id_parent'][2] == 'P02S01'
     assert dfs[2]['id'][2] == 'P02S01T02'
     assert dfs[2]['label'][2] == 'P02S01T02 parse file'
+
+
+# Tests
+def test_extract_hierarchy_alt_names(logger):
+    keys = ['repo', 'package', 'class']
+    data = {'repo':  ['r1', 'r2', 'r2', 'r2', 'r3', 'r3'],
+            'package': ['r1p1', 'r2p1', 'r2p1', 'r2p2', 'r3p1', 'r3p2', ],
+            'class': ['r1p1c1', 'r2p1c1', 'r2p1c2', 'r2p2c1', 'r3p1c1', 'r3p2c1']
+            }
+
+    df = pd.DataFrame(data, columns=keys)
+
+    marks = "RPC"
+
+    dfs = extract_hierarchy(df, keys, marks)
+
+    assert len(dfs) == 3
+
+    assert dfs[0].shape == (3, 4)
+    assert dfs[0]['repo'][1] == 'r2'
+    assert dfs[0]['pos'][1] == 2
+    assert dfs[0]['id'][1] == 'R02'
+    assert dfs[0]['label'][1] == 'R02 r2'
+
+    assert dfs[1].shape == (5, 6)
+    assert dfs[1]['repo'][2] == 'r2'
+    assert dfs[1]['package'][2] == 'r2p2'
+    assert dfs[1]['pos'][2] == 2
+    assert dfs[1]['id_parent'][2] == 'R02'
+    assert dfs[1]['id'][2] == 'R02P02'
+    assert dfs[1]['label'][2] == 'R02P02 r2p2'
+
+    assert dfs[2].shape == (6, 7)
+    assert dfs[2]['repo'][2] == 'r2'
+    assert dfs[2]['package'][2] == 'r2p1'
+    assert dfs[2]['class'][2] == 'r2p1c2'
+    assert dfs[2]['pos'][2] == 2
+    assert dfs[2]['id_parent'][2] == 'R02P01'
+    assert dfs[2]['id'][2] == 'R02P01C02'
+    assert dfs[2]['label'][2] == 'R02P01C02 r2p1c2'

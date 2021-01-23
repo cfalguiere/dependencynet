@@ -38,21 +38,27 @@ def build_tree(dfs, keys):
     return tree
 
 
-def pretty_print_tree(tree):
-    l0 = tree['process_dict']
-    print(f"there are {len(l0)} process")
-    print(f" {', '.join([str(p) for p in [*l0]])}")
+def pretty_print_tree(tree, keys):
+    lines = []
+    elt0_name = "%s_dict" % keys[0]
+    l0 = tree[elt0_name]
+    lines.append(f"there are {len(l0)} {keys[0]}(s)")
+    lines.append(f"  {', '.join([str(p) for p in [*l0]])}")
 
     for k0, v0 in l0.items():
-        print(f"  process {k0}:")
-        l1 = v0['step_dict']
-        print(f"    has {len(l1)} step(s)")
-        print(f"     {', '.join([str(i) for i in [*l1]])}")
+        lines.append(f"  {keys[0]} {k0}: {v0[keys[0]]}")
+        elt1_name = "%s_dict" % keys[1]
+        l1 = v0[elt1_name]
+        lines.append(f"    has {len(l1)} {keys[1]}(s)")
+        lines.append(f"      {', '.join([str(i) for i in [*l1]])}")
 
         for k1, v1 in l1.items():
-            print(f"    step {k1}:")
-            l2 = v1['task_dict']
-            print(f"      has {len(l2)} task(s)")
-            print(f"       {', '.join([str(i) for i in [*l2]])}")
+            lines.append(f"      {keys[1]} {k1}: {v1[keys[1]]}")
+            elt2_name = "%s_dict" % keys[2]
+            l2 = v1[elt2_name]
+            lines.append(f"        has {len(l2)} {keys[2]}(s)")
+            lines.append(f"          {', '.join([str(i) for i in [*l2]])}")
             for k2, v2 in l2.items():
-                print(f"        task {k2}:")
+                lines.append(f"          {keys[2]} {k2}: {v2[keys[2]]}")
+
+    return lines
