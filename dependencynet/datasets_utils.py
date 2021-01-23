@@ -1,5 +1,5 @@
 """
-This modukle provides helpers to buimd the source datasets of the graph
+This module provides helpers to build the source datasets of the graph
 """
 import os
 import logging
