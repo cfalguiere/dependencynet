@@ -1,10 +1,10 @@
 # third party import
 import pytest
 
-# module import
 import logging
 import pandas as pd
 
+# module import
 from dependencynet.datasets_utils import extract_hierarchy
 
 
