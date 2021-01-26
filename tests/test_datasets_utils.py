@@ -2,6 +2,7 @@
 import pytest
 
 import logging
+from os import path
 import pandas as pd
 
 # module import
@@ -16,84 +17,49 @@ def logger():
 
 
 @pytest.fixture
-def source_data():
-    data = {'process':  ['X', 'Y', 'Y', 'Y', 'Z', 'Z'],
-            'step': ['load data', 'load data', 'load data', 'aggregate', 'load data', 'aggregate', ],
-            'task': ['read file', 'read file', 'parse file', 'average', 'read csv', 'sum']
-            }
+def source_data_towns():
+    filename = path.join('tests', 'resources', 'compact', 'towns.csv')
+    data = pd.read_csv(filename, delimiter=';')
 
-    df = pd.DataFrame(data, columns=['process', 'step', 'task'])
+    df = pd.DataFrame(data, columns=['area', 'country', 'town'])
 
     return df
 
 
 # Tests
-def test_extract_hierarchy(source_data, logger):
-    keys = ['process', 'step', 'task']
-    marks = "PST"
-    dfs = extract_hierarchy(source_data, keys, marks)
+def test_extract_hierarchy_towns(source_data_towns, logger):
+    keys = ['area', 'country', 'town']
+    marks = "ACT"
+    dfs = extract_hierarchy(source_data_towns, keys, marks)
 
     assert len(dfs) == 3
 
-    assert dfs[0].shape == (3, 4)
-    assert dfs[0]['process'][1] == 'Y'
-    assert dfs[0]['pos'][1] == 2
-    assert dfs[0]['id'][1] == 'P02'
-    assert dfs[0]['label'][1] == 'P02 Y'
+    df_area = dfs[0]
+    assert df_area.shape == (2, 4)
+    assert list(df_area.columns) == ['area', 'pos', 'id', 'label']
+    assert df_area['area'][4] == 'Asia'
+    assert df_area['pos'][4] == 2
+    assert df_area['id'][4] == 'A02'
+    assert df_area['label'][4] == 'A02 Asia'
 
-    assert dfs[1].shape == (5, 6)
-    assert dfs[1]['process'][2] == 'Y'
-    assert dfs[1]['step'][2] == 'aggregate'
-    assert dfs[1]['pos'][2] == 2
-    assert dfs[1]['id_parent'][2] == 'P02'
-    assert dfs[1]['id'][2] == 'P02S02'
-    assert dfs[1]['label'][2] == 'P02S02 aggregate'
+    df_country = dfs[1]
+    assert df_country.shape == (4, 6)
+    assert list(df_country.columns) == ['area', 'country', 'pos', 'id_parent', 'id', 'label']
+    assert df_country['area'][2] == 'Europe'
+    assert df_country['country'][2] == 'Italia'
+    assert df_country['pos'][2] == 3
+    assert df_country['id_parent'][2] == 'A01'
+    assert df_country['id'][2] == 'A01C03'
+    assert df_country['label'][2] == 'A01C03 Italia'
 
-    assert dfs[2].shape == (6, 7)
-    assert dfs[2]['process'][2] == 'Y'
-    assert dfs[2]['step'][2] == 'load data'
-    assert dfs[2]['task'][2] == 'parse file'
-    assert dfs[2]['pos'][2] == 2
-    assert dfs[2]['id_parent'][2] == 'P02S01'
-    assert dfs[2]['id'][2] == 'P02S01T02'
-    assert dfs[2]['label'][2] == 'P02S01T02 parse file'
-
-
-# Tests
-def test_extract_hierarchy_alt_names(logger):
-    keys = ['repo', 'package', 'class']
-    data = {'repo':  ['r1', 'r2', 'r2', 'r2', 'r3', 'r3'],
-            'package': ['r1p1', 'r2p1', 'r2p1', 'r2p2', 'r3p1', 'r3p2', ],
-            'class': ['r1p1c1', 'r2p1c1', 'r2p1c2', 'r2p2c1', 'r3p1c1', 'r3p2c1']
-            }
-
-    df = pd.DataFrame(data, columns=keys)
-
-    marks = "RPC"
-
-    dfs = extract_hierarchy(df, keys, marks)
-
-    assert len(dfs) == 3
-
-    assert dfs[0].shape == (3, 4)
-    assert dfs[0]['repo'][1] == 'r2'
-    assert dfs[0]['pos'][1] == 2
-    assert dfs[0]['id'][1] == 'R02'
-    assert dfs[0]['label'][1] == 'R02 r2'
-
-    assert dfs[1].shape == (5, 6)
-    assert dfs[1]['repo'][2] == 'r2'
-    assert dfs[1]['package'][2] == 'r2p2'
-    assert dfs[1]['pos'][2] == 2
-    assert dfs[1]['id_parent'][2] == 'R02'
-    assert dfs[1]['id'][2] == 'R02P02'
-    assert dfs[1]['label'][2] == 'R02P02 r2p2'
-
-    assert dfs[2].shape == (6, 7)
-    assert dfs[2]['repo'][2] == 'r2'
-    assert dfs[2]['package'][2] == 'r2p1'
-    assert dfs[2]['class'][2] == 'r2p1c2'
-    assert dfs[2]['pos'][2] == 2
-    assert dfs[2]['id_parent'][2] == 'R02P01'
-    assert dfs[2]['id'][2] == 'R02P01C02'
-    assert dfs[2]['label'][2] == 'R02P01C02 r2p1c2'
+    df_town = dfs[2]
+    print(df_town)
+    assert df_town.shape == (5, 7)
+    assert list(df_town.columns) == ['area', 'country', 'town', 'pos', 'id_parent', 'id', 'label']
+    assert df_town['area'][1] == 'Europe'
+    assert df_town['country'][1] == 'France'
+    assert df_town['town'][1] == 'Lyon'
+    assert df_town['pos'][1] == 2
+    assert df_town['id_parent'][1] == 'A01C01'
+    assert df_town['id'][1] == 'A01C01T02'
+    assert df_town['label'][1] == 'A01C01T02 Lyon'
