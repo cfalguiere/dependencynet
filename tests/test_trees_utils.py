@@ -1,7 +1,6 @@
 # third party import
 import pytest
 
-import logging
 from os import path
 
 import pandas as pd
@@ -12,34 +11,21 @@ from dependencynet.trees_utils import build_tree, pretty_print_tree
 
 
 @pytest.fixture
-def logger():
-    logging.basicConfig()
-    logger = logging.getLogger('test_datasets_utils')
-    logger.setLevel(logging.WARN)
-
-
-@pytest.fixture
-def keys_towns():
-    keys = ['area', 'country', 'town']
-    return keys
-
-
-@pytest.fixture
-def tree_datasets_towns(keys_towns):
+def tree_datasets_towns(schema_towns):
     filename = path.join('tests', 'resources', 'data', 'compact', 'towns.csv')
     data = pd.read_csv(filename, delimiter=';')
 
-    df = pd.DataFrame(data, columns=keys_towns)
+    levels_keys = schema_towns.levels_keys()
+    df = pd.DataFrame(data, columns=levels_keys)
 
-    marks = "ACT"
-    dfs = extract_hierarchy(df, keys_towns, marks)
+    dfs = extract_hierarchy(df, levels_keys, schema_towns.levels_marks())
 
     return dfs
 
 
 # Tests
-def test_build_tree_towns(tree_datasets_towns, keys_towns, logger):
-    tree = build_tree(tree_datasets_towns, keys_towns)
+def test_build_tree_towns(tree_datasets_towns, schema_towns):
+    tree = build_tree(tree_datasets_towns, schema_towns.levels_keys())
 
     assert tree
     assert len(tree['area_dict']) == 2
@@ -54,9 +40,10 @@ def test_build_tree_towns(tree_datasets_towns, keys_towns, logger):
 
 
 # Tests
-def test_pretty_print_tree(tree_datasets_towns, keys_towns, logger):
-    tree = build_tree(tree_datasets_towns, keys_towns)
-    lines = pretty_print_tree(tree, keys_towns)
+def test_pretty_print_tree(tree_datasets_towns, schema_towns):
+    levels_keys = schema_towns.levels_keys()
+    tree = build_tree(tree_datasets_towns, levels_keys)
+    lines = pretty_print_tree(tree, levels_keys)
 
     assert len(lines) == 25
     assert lines[0] == 'there are 2 area(s)'

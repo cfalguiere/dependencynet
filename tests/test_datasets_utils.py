@@ -1,41 +1,27 @@
 # third party import
 import pytest
 
-import logging
 from os import path
 import pandas as pd
+
 
 # module import
 from dependencynet.datasets_utils import extract_hierarchy
 
 
 @pytest.fixture
-def logger():
-    logging.basicConfig()
-    logger = logging.getLogger('test_datasets_utils')
-    logger.setLevel(logging.WARN)
-
-
-@pytest.fixture
-def keys_towns():
-    keys = ['area', 'country', 'town']
-    return keys
-
-
-@pytest.fixture
-def source_data_towns(keys_towns):
+def source_data_towns(schema_towns):
     filename = path.join('tests', 'resources', 'data', 'compact', 'towns.csv')
     data = pd.read_csv(filename, delimiter=';')
 
-    df = pd.DataFrame(data, columns=keys_towns)
+    df = pd.DataFrame(data, columns=schema_towns.levels_keys())
 
     return df
 
 
 # Tests
-def test_extract_hierarchy_towns(source_data_towns, keys_towns, logger):
-    marks = "ACT"
-    dfs = extract_hierarchy(source_data_towns, keys_towns, marks)
+def test_extract_hierarchy_towns(source_data_towns, schema_towns):
+    dfs = extract_hierarchy(source_data_towns, schema_towns.levels_keys(), schema_towns.levels_marks())
 
     assert len(dfs) == 3
 

@@ -57,3 +57,11 @@ class Schema:
     @classmethod
     def __repr__(self):
         return f"<Schema levels {self.levels} - resources {self.resources}>"
+
+    @classmethod
+    def levels_keys(self):
+        return self.levels['keys']
+
+    @classmethod
+    def levels_marks(self):
+        return self.levels['marks']

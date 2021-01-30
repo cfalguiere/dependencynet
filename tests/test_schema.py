@@ -1,21 +1,13 @@
 # third party import
-import pytest
-
-import logging
 
 # module import
 from dependencynet.schema import SchemaBuilder
 
-
-@pytest.fixture
-def logger():
-    logging.basicConfig()
-    logger = logging.getLogger('test_datasets_utils')
-    logger.setLevel(logging.WARN)
+# TODO Schema SchemaOperations
 
 
 # Tests
-def test_schema_builder_towns(logger):
+def test_schema_builder_towns():
     schema = SchemaBuilder().level('area', 'A') \
                             .level('country', 'C') \
                             .level('town', 'T') \
@@ -29,3 +21,17 @@ def test_schema_builder_towns(logger):
     assert schema.levels['keys'][1] == 'country'
     assert schema.levels['marks'][1] == 'C'
     assert schema.resources['M'] == 'monument'
+
+
+# Tests
+def test_schema_level_keys_towns(schema_towns):
+    keys = schema_towns.levels_keys()
+
+    assert keys == ['area', 'country', 'town']
+
+
+# Tests
+def test_schema_level_marks_towns(schema_towns):
+    keys = schema_towns.levels_marks()
+
+    assert keys == ['A', 'C', 'T']
