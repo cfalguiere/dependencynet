@@ -68,9 +68,12 @@ def extract_items_non_root(df, keys, id_pattern, parent_df):
     return items_df
 
 
-def extract_hierarchy(df, keys, marks):
+def extract_hierarchy(df, schema):
     dfs = []
-    logger.debug('extract_hierarchy keys=%s marks=%s', keys, marks)
+    logger.debug('extract_hierarchy schema=%s', schema)
+
+    keys = schema.levels_keys()
+    marks = schema.levels_marks()
 
     pattern = '%s{id:02d}' % marks[0]
 

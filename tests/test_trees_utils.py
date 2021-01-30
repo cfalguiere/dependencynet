@@ -18,7 +18,7 @@ def tree_datasets_towns(schema_towns):
     levels_keys = schema_towns.levels_keys()
     df = pd.DataFrame(data, columns=levels_keys)
 
-    dfs = extract_hierarchy(df, levels_keys, schema_towns.levels_marks())
+    dfs = extract_hierarchy(df, schema_towns)
 
     return dfs
 

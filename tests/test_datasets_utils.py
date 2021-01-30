@@ -14,6 +14,7 @@ def source_data_towns(schema_towns):
     filename = path.join('tests', 'resources', 'data', 'compact', 'towns.csv')
     data = pd.read_csv(filename, delimiter=';')
 
+    # TODO toutes les colonnes du csv
     df = pd.DataFrame(data, columns=schema_towns.levels_keys())
 
     return df
@@ -21,7 +22,7 @@ def source_data_towns(schema_towns):
 
 # Tests
 def test_extract_hierarchy_towns(source_data_towns, schema_towns):
-    dfs = extract_hierarchy(source_data_towns, schema_towns.levels_keys(), schema_towns.levels_marks())
+    dfs = extract_hierarchy(source_data_towns, schema_towns)
 
     assert len(dfs) == 3
 

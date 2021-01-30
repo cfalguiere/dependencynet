@@ -36,6 +36,7 @@ class SchemaBuilder:
     @classmethod
     def resource(self, label, mark):
         # TODI check whether mark is unique
+        # TODO which is key
         self.resources[mark] = label
         return self
 
@@ -48,6 +49,8 @@ class SchemaBuilder:
 class Schema:
     levels = None
     resources = None
+
+    # TODO level resource info
 
     @classmethod
     def __init__(self, levels, resources):
