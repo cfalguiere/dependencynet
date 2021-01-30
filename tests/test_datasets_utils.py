@@ -17,20 +17,25 @@ def logger():
 
 
 @pytest.fixture
-def source_data_towns():
-    filename = path.join('tests', 'resources', 'compact', 'towns.csv')
+def keys_towns():
+    keys = ['area', 'country', 'town']
+    return keys
+
+
+@pytest.fixture
+def source_data_towns(keys_towns):
+    filename = path.join('tests', 'resources', 'data', 'compact', 'towns.csv')
     data = pd.read_csv(filename, delimiter=';')
 
-    df = pd.DataFrame(data, columns=['area', 'country', 'town'])
+    df = pd.DataFrame(data, columns=keys_towns)
 
     return df
 
 
 # Tests
-def test_extract_hierarchy_towns(source_data_towns, logger):
-    keys = ['area', 'country', 'town']
+def test_extract_hierarchy_towns(source_data_towns, keys_towns, logger):
     marks = "ACT"
-    dfs = extract_hierarchy(source_data_towns, keys, marks)
+    dfs = extract_hierarchy(source_data_towns, keys_towns, marks)
 
     assert len(dfs) == 3
 
