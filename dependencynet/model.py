@@ -223,5 +223,5 @@ class ModelStorageService:
     def __save_tree(self, model_folder, model):
         filename = path.join(model_folder, 'tree.json')
         with open(filename, "w") as fh:
-            json.dump(model.tree, fh, cls=TreeModelEncoder, indent=2)
+            json.dump(model.tree_model, fh, cls=TreeModelEncoder, indent=2)
             logger.info("tree saved under name %s", filename)

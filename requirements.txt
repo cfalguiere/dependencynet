@@ -1,3 +1,5 @@
 pandas
-#networkx
-#cytoscape
+networkx
+ipycytoscape
+pyyed
+pygraphml
