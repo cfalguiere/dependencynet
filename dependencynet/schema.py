@@ -2,20 +2,31 @@
 This module provides helpers to manage the data schema
 """
 import logging
+from json import JSONEncoder
 
 
-class SchemaOperations:
-    logger = logging.getLogger(__name__)
+class Schema:
+    levels = None
+    resources = None
 
-    @staticmethod
-    def load(self, schema, filename, sep=','):
-        # TODO
-        pass
+    # TODO level resource info
 
-    @staticmethod
-    def save(self, schema, filename, sep=','):
-        # TODO
-        pass
+    @classmethod
+    def __init__(self, levels, resources):
+        self.levels = levels
+        self.resources = resources
+
+    @classmethod
+    def __repr__(self):
+        return f"<Schema levels {self.levels} - resources {self.resources}>"
+
+    @classmethod
+    def levels_keys(self):
+        return self.levels['keys']
+
+    @classmethod
+    def levels_marks(self):
+        return self.levels['marks']
 
 
 class SchemaBuilder:
@@ -46,25 +57,26 @@ class SchemaBuilder:
         return Schema(self.levels, self.resources)
 
 
-class Schema:
-    levels = None
-    resources = None
+class SchemaStorage:
+    logger = logging.getLogger(__name__)
 
-    # TODO level resource info
+    @staticmethod
+    def load(self, schema, filename, sep=','):
+        # TODO
+        pass
 
-    @classmethod
-    def __init__(self, levels, resources):
-        self.levels = levels
-        self.resources = resources
+    @staticmethod
+    def save(self, schema, filename, sep=','):
+        # TODO
+        pass
 
-    @classmethod
-    def __repr__(self):
-        return f"<Schema levels {self.levels} - resources {self.resources}>"
 
-    @classmethod
-    def levels_keys(self):
-        return self.levels['keys']
+class SchemaEncoder(JSONEncoder):
+    def default(self, o):
+        properties = {'levels': o.levels, 'resources': o.resources}
+        return properties
 
-    @classmethod
-    def levels_marks(self):
-        return self.levels['marks']
+    # def from_json(json_object):
+    #    if 'fname' in json_object:
+    #       return FileItem(json_object['fname'])
+    # f = JSONDecoder(object_hook = from_json).decode('{"fname": "/foo/bar"}')

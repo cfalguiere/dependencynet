@@ -1,7 +1,7 @@
 # third party import
 
 # module import
-from dependencynet.schema import SchemaBuilder
+from dependencynet.schema import SchemaBuilder, SchemaEncoder
 
 # TODO Schema SchemaOperations
 
@@ -35,3 +35,12 @@ def test_schema_level_marks_towns(schema_towns):
     keys = schema_towns.levels_marks()
 
     assert keys == ['A', 'C', 'T']
+
+
+# Tests
+def test_schema_encoder(schema_towns):
+    encoded = SchemaEncoder().encode(schema_towns)
+
+    assert 'levels' in encoded
+    assert 'area' in encoded
+    assert 'resources' in encoded

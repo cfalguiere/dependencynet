@@ -3,7 +3,7 @@ import nox
 
 @nox.session
 def tests(session):
-    session.install('pytest')
+    session.install('pytest', 'testfixtures')
     session.install('--quiet', '-r', 'requirements.txt')
     session.install('-e', '.')
     session.run('pytest')
