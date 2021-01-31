@@ -24,3 +24,9 @@ def schema_towns():
                             .level('town', 'T') \
                             .render()
     return schema
+
+
+@pytest.fixture(scope="session")
+def compact_columns_towns():
+    columns = ['area', 'country', 'town']
+    return columns

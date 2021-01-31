@@ -11,12 +11,11 @@ from dependencynet.trees_utils import build_tree, pretty_print_tree
 
 
 @pytest.fixture
-def tree_datasets_towns(schema_towns):
+def tree_datasets_towns(compact_columns_towns, schema_towns):
     filename = path.join('tests', 'resources', 'data', 'compact', 'towns.csv')
     data = pd.read_csv(filename, delimiter=';')
 
-    levels_keys = schema_towns.levels_keys()
-    df = pd.DataFrame(data, columns=levels_keys)
+    df = pd.DataFrame(data, columns=compact_columns_towns)
 
     dfs = extract_hierarchy(df, schema_towns)
 
