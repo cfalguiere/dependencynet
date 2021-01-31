@@ -96,5 +96,30 @@ def test_model_storage_towns(source_data_towns, schema_towns, root_location):
         assert path.exists(level_dataset_file)
         assert path.isfile(level_dataset_file)
 
-# TODO schema , tree , res
+    # tree
+    tree_file = path.join(model_folder, 'tree.json')
+    assert path.exists(tree_file)
+    assert path.isfile(tree_file)
+
+
+# Tests
+def test_pretty_print(source_data_towns, schema_towns):
+    model = ModelBuilder().from_compact(source_data_towns) \
+                          .with_schema(schema_towns) \
+                          .render()
+
+    lines = model.pretty_print()
+
+    assert len(lines) == 25
+    assert lines[0] == 'there are 2 area(s)'
+    assert lines[1] == '  A01, A02'
+    assert lines[2] == '  area A01: Europe'
+    assert lines[3] == '    has 3 country(s)'
+    assert lines[4] == '      A01C01, A01C02, A01C03'
+    assert lines[5] == '      country A01C01: France'
+    assert lines[6] == '        has 2 town(s)'
+    assert lines[7] == '          A01C01T01, A01C01T02'
+    assert lines[9] == '          town A01C01T02: Lyon'
+
+# TODO res
 # TODO given model name
