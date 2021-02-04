@@ -2,4 +2,5 @@ pandas
 networkx
 ipycytoscape
 pyyed
-pygraphml
+beautifulsoup4
+lxml
