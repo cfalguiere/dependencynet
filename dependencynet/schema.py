@@ -6,10 +6,6 @@ from json import JSONEncoder
 
 
 class Schema:
-    levels = None
-    resources = None
-
-    # TODO level resource info
 
     @classmethod
     def __init__(self, levels, resources):
@@ -28,6 +24,14 @@ class Schema:
     def levels_marks(self):
         return self.levels['marks']
 
+    @classmethod
+    def resources_keys(self):
+        return list(self.resources.keys())
+
+    @classmethod
+    def resource_mark(self, key):
+        return self.resources[key]  # FIXME return mark directly
+
 
 class SchemaBuilder:
     logger = logging.getLogger(__name__)
@@ -45,10 +49,10 @@ class SchemaBuilder:
         return self
 
     @classmethod
-    def resource(self, label, mark):
+    def resource(self, label, mark, explode=False, delimiter='|'):
         # TODI check whether mark is unique
         # TODO which is key
-        self.resources[mark] = label
+        self.resources[label] = mark
         return self
 
     @classmethod

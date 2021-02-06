@@ -15,7 +15,7 @@ from dependencynet.schema import SchemaBuilder
 def logger():
     logging.basicConfig()
     logger = logging.getLogger('test_datasets_utils')
-    logger.setLevel(logging.WARN)
+    logger.setLevel(logging.DEBUG)
 
 
 @pytest.fixture()
@@ -24,16 +24,18 @@ def root_location():
         yield dir
 
 
-@pytest.fixture(scope="session")
+# (scope="session")
+@pytest.fixture
 def schema_towns():
     schema = SchemaBuilder().level('area', 'A') \
                             .level('country', 'C') \
                             .level('town', 'T') \
+                            .resource('monument', 'M', explode=True, delimiter=',') \
                             .render()
     return schema
 
 
 @pytest.fixture(scope="session")
 def compact_columns_towns():
-    columns = ['area', 'country', 'town']
+    columns = ['area', 'country', 'town', 'monument']
     return columns

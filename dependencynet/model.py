@@ -10,33 +10,53 @@ import pandas as pd
 from dependencynet.schema import SchemaEncoder
 from dependencynet.tree_model import TreeModelBuilder, TreeModelEncoder
 
-logger = logging.getLogger(__name__)
-
 
 class Model:
-    levels_datasets = None
-    tree_model = None
-    schema = None
 
     @classmethod
-    def __init__(self, schema, levels_datasets, tree_model):
+    def __init__(self, schema, levels_datasets, resources_datasets, tree_model):
         self.schema = schema
-        self.levels_datasets = levels_datasets
+        self.levels_datasets = levels_datasets  # list
+        self.resources_datasets = resources_datasets   # map
         self.tree_model = tree_model
 
     @classmethod
     def __repr__(self):
-        return f"<Model levels_datasets {len(self.levels_datasets)}>"
+        nbl = len(self.levels_datasets)
+        nbr = len(self.resources_datasets)
+        return f"<Model levels_datasets {nbl} resources_datasets {nbr}>"
+
+    @property
+    def schema(self):
+        return self.schema
+
+    @property
+    def levels_datasets(self):
+        return self.levels_datasets
+
+    @property
+    def resources_datasets(self):
+        return self.resources_datasets
+
+    @property
+    def tree_model(self):
+        return self.tree_model
 
     @classmethod
     def level_dataset(self, pos):
         # TODO check for quality
-        return self.levels_datasets[pos]
+        return self.levels_datasets[pos]  # pos is an int
+
+    @classmethod
+    def resource_dataset(self, key):
+        # TODO check for quality
+        return self.resources_datasets[key]  # jey is a string
 
     @classmethod
     def pretty_print(self):
         tree = self.tree_model.tree
         keys = self.schema.levels_keys()
+        resources_keys = self.schema.resources_keys()
 
         lines = []
         elt0_name = "%s_dict" % keys[0]
@@ -60,6 +80,14 @@ class Model:
                 for k2, v2 in l2.items():
                     lines.append(f"          {keys[2]} {k2}: {v2[keys[2]]}")
 
+                    for name in resources_keys:
+                        eltr_name = "%s_dict" % name
+                        lr = v2[eltr_name]
+                        lines.append(f"            has {len(lr)} {name}(s)")
+                        lines.append(f"               {', '.join([str(i) for i in [*lr]])}")
+                        for kr, vr in lr.items():
+                            lines.append(f"                 {name} {kr}: {vr[name]}")
+
         return lines
 
 
@@ -68,7 +96,8 @@ class ModelBuilder():
 
     @classmethod
     def __init__(self):
-        pass
+        self.source_df = None
+        self.schema = None
 
     @classmethod
     def from_compact(self, source_df):
@@ -84,22 +113,31 @@ class ModelBuilder():
 
     @classmethod
     def render(self):
+        self.logger.debug('render getting levels')
         levels_datasets = self.__extract_hierarchy(self.source_df, self.schema)
-        tree_model = TreeModelBuilder().from_canonical(levels_datasets, None) \
+        df_parent = levels_datasets[2]  # FIXME last item of list
+
+        self.logger.debug('render getting datasets')
+        resources_datasets = self.__extract_resources(self.source_df, df_parent, self.schema)
+
+        self.logger.debug('render building tree model')
+        tree_model = TreeModelBuilder().from_canonical(levels_datasets, resources_datasets) \
                                        .with_schema(self.schema) \
                                        .render()
 
-        return Model(self.schema, levels_datasets, tree_model)
+        self.logger.debug('render creating resulting model')
+
+        return Model(self.schema, levels_datasets, resources_datasets, tree_model)
 
     # ---- private
 
     @classmethod
     def __extract_items_root(self, df, keys, id_pattern):
-        logger.debug('extract_items_root keys=%s id_pattern=%s', keys, id_pattern)
+        self.logger.debug('extract_items_root keys=%s id_pattern=%s', keys, id_pattern)
 
         id_key = keys[-1]
         pos_key = 'pos'
-        logger.debug('extract_items_root id_key=%s', id_key)
+        self.logger.debug('extract_items_root id_key=%s', id_key)
 
         items_df = df.drop_duplicates(subset=keys)[keys]
 
@@ -119,17 +157,17 @@ class ModelBuilder():
         items_df['id'] = items_df[pos_key].apply(lambda x: format_id(x))
         items_df['label'] = items_df.apply(lambda row: "%s %s" % (row['id'], row[id_key]), axis=1)
 
-        logger.info('extract_items_root keys=%s id_pattern=%s => shape=%s', keys, id_pattern, items_df.shape)
+        self.logger.info('extract_items_root keys=%s id_pattern=%s => shape=%s', keys, id_pattern, items_df.shape)
 
         return items_df
 
     @classmethod
     def __extract_items_non_root(self, df, keys, id_pattern, parent_df):
-        logger.debug('extract_items_non_root keys=%s id_pattern=%s', keys, id_pattern)
+        self.logger.debug('extract_items_non_root keys=%s id_pattern=%s', keys, id_pattern)
 
         id_key = keys[-1]
         parent_keys = keys[0:-1]
-        logger.debug('extract_items_non_root id_key=%s', id_key)
+        self.logger.debug('extract_items_non_root id_key=%s', id_key)
 
         pos_key = 'pos'
 
@@ -150,27 +188,80 @@ class ModelBuilder():
                     axis=1)
         items_df['label'] = items_df.apply(lambda row: "%s %s" % (row['id'], row[id_key]), axis=1)
 
-        logger.info('extract_items_root keys=%s id_pattern=%s => shape=%s', keys, id_pattern, items_df.shape)
+        self.logger.info('extract_items_root keys=%s id_pattern=%s => shape=%s', keys, id_pattern, items_df.shape)
 
         return items_df
 
     @classmethod
-    def __extract_hierarchy(self, df, schema):
+    def __extract_hierarchy(self, source_df, schema):
         dfs = []
-        logger.debug('extract_hierarchy schema=%s', schema)
+        self.logger.debug('extract_hierarchy schema=%s', schema)
 
         keys = schema.levels_keys()
         marks = schema.levels_marks()
 
         pattern = '%s{id:02d}' % marks[0]
 
-        df_parent = self.__extract_items_root(df, [keys[0]], pattern)
+        df_parent = self.__extract_items_root(source_df, [keys[0]], pattern)
         dfs.append(df_parent)
         for i in range(1, len(keys)):
-            df_i = self.__extract_items_non_root(df, keys[0:i+1], '{id_parent}%s{id:02d}' % marks[i], df_parent)
+            df_i = self.__extract_items_non_root(source_df, keys[0:i+1], '{id_parent}%s{id:02d}' % marks[i], df_parent)
             dfs.append(df_i)
             df_parent = df_i
         return dfs
+
+    @classmethod
+    def __extract_resources(self, source_df, df_parent, schema):
+        dfs = {}
+        self.logger.debug('extract_resource schema=%s', schema)
+
+        keys = schema.resources_keys()
+        for key in keys:
+            mark = schema.resource_mark(key)
+            df = self.__extract_resource(source_df,
+                                         key,
+                                         '{id_parent}%s{id:02d}' % mark,
+                                         df_parent,
+                                         schema.levels_keys())
+            dfs[key] = df
+        return dfs
+
+    @classmethod
+    def __extract_resource(self, df, id_key, id_pattern, parent_df, parent_keys):
+        self.logger.debug(f'__extract_resource columns={df.columns}')
+
+        if id_key not in df.columns:
+            raise RuntimeError(f'{id_key} not found in datasource - columns:{df.columns}')
+
+        self.logger.debug('__extract_resource key=%s id_pattern=%s', id_key, id_pattern)
+
+        self.logger.debug('__extract_resource id_key=%s', id_key)
+
+        pos_key = 'pos'
+
+        reference_keys = parent_keys.copy()
+        reference_keys.append(id_key)
+        self.logger.debug('__extract_resource reference_keys=%s', reference_keys)
+        items_df = df.drop_duplicates(subset=reference_keys)[reference_keys]
+
+        items_df[pos_key] = items_df.groupby(parent_keys).cumcount()
+        items_df[pos_key] = items_df[pos_key] + 1
+
+        # enrich with parent id
+        items_df = pd.merge(items_df, parent_df[parent_keys + ['id']], on=parent_keys)
+        columns_mapping = {
+            'id': 'id_parent'
+        }
+        items_df = items_df.rename(columns=columns_mapping)
+
+        items_df['id'] = items_df.apply(
+                    lambda row: id_pattern.format(id=row[pos_key], id_parent=row['id_parent']),
+                    axis=1)
+        items_df['label'] = items_df.apply(lambda row: "%s %s" % (row['id'], row[id_key]), axis=1)
+
+        self.logger.info('__extract_resource keys=%s id_pattern=%s => shape=%s', reference_keys, id_pattern, items_df.shape)
+
+        return items_df
 
 
 class ModelStorageService:
@@ -192,36 +283,53 @@ class ModelStorageService:
             makedirs(self.root_location, exist_ok=True)
             model_folder = path.join(self.root_location, model_name)
             makedirs(model_folder, exist_ok=True)  # TODO clean before replace
-            logger.info("model folder is %s", model_folder)
+            self.logger.info("model folder is %s", model_folder)
             self.__save_schema(model_folder, model)
             self.__save_levels(model_folder, model)
+            self.__save_resources(model_folder, model)
             self.__save_tree(model_folder, model)
         except Exception as err:
-            logger.error('Model not saved. Reason: %s', err)
+            self.logger.error('Model not saved. Reason: %s', err)
 
     # ---- private
 
     @classmethod
     def __save_schema(self, model_folder, model):
+        self.logger.debug("__save_schema")
         filename = path.join(model_folder, 'schema.json')
         with open(filename, "w") as fh:
             json.dump(model.schema, fh, cls=SchemaEncoder, indent=2)
-            logger.info("schema saved under name %s", filename)
+            self.logger.info("schema saved under name %s", filename)
 
     @classmethod
     def __save_levels(self, model_folder, model):
         names = model.schema.levels_keys()
+        self.logger.debug(f"__save_levels names={names}")
 
         def save_level(df, name):
+            self.logger.debug(f"save_level {name}")
             filename = path.join(model_folder, f'{name}.csv')
             df.to_csv(filename, sep=self.sep, index=False)
-            logger.info("dateset saved under name %s", filename)
+            self.logger.info("dateset saved under name %s", filename)
 
         [save_level(model.levels_datasets[i], names[i]) for i in range(len(names))]
+
+    @classmethod
+    def __save_resources(self, model_folder, model):
+        names = model.schema.resources_keys()
+        self.logger.debug(f"__save_resources names={names}")
+
+        def save_resource(df, name):
+            self.logger.debug(f"save_resource {name}")
+            filename = path.join(model_folder, f'{name}.csv')
+            df.to_csv(filename, sep=self.sep, index=False)
+            self.logger.info("dateset saved under name %s", filename)
+
+        [save_resource(model.resource_dataset(name), name) for name in names]
 
     @classmethod
     def __save_tree(self, model_folder, model):
         filename = path.join(model_folder, 'tree.json')
         with open(filename, "w") as fh:
             json.dump(model.tree_model, fh, cls=TreeModelEncoder, indent=2)
-            logger.info("tree saved under name %s", filename)
+            self.logger.info("tree saved under name %s", filename)

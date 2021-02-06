@@ -8,19 +8,19 @@ from dependencynet.schema import SchemaBuilder, SchemaEncoder
 
 # Tests
 def test_schema_builder_towns():
-    schema = SchemaBuilder().level('area', 'A') \
+    a_schema = SchemaBuilder().level('area', 'A') \
                             .level('country', 'C') \
                             .level('town', 'T') \
                             .resource('monument', 'M') \
-                            .resource('station', 'S') \
                             .render()
+    # .resource('station', 'S') \  # FIXME  fixture is altered ?
 
-    assert schema
-    assert len(schema.levels['keys']) == 3
-    assert len(schema.levels['marks']) == 3
-    assert schema.levels['keys'][1] == 'country'
-    assert schema.levels['marks'][1] == 'C'
-    assert schema.resources['M'] == 'monument'
+    assert a_schema
+    assert len(a_schema.levels['keys']) == 3
+    assert len(a_schema.levels['marks']) == 3
+    assert a_schema.levels['keys'][1] == 'country'
+    assert a_schema.levels['marks'][1] == 'C'
+    assert a_schema.resources['monument'] == 'M'  # FIXME structure including M
 
 
 # Tests
@@ -32,9 +32,23 @@ def test_schema_level_keys_towns(schema_towns):
 
 # Tests
 def test_schema_level_marks_towns(schema_towns):
-    keys = schema_towns.levels_marks()
+    marks = schema_towns.levels_marks()
 
-    assert keys == ['A', 'C', 'T']
+    assert marks == ['A', 'C', 'T']
+
+
+# Tests
+def test_schema_resource_keys_towns(schema_towns):
+    keys = schema_towns.resources_keys()
+
+    assert keys == ['monument']
+
+
+# Tests
+def test_schema_resource_mark_towns(schema_towns):
+    mark = schema_towns.resource_mark('monument')
+
+    assert mark == 'M'
 
 
 # Tests
