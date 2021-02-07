@@ -5,10 +5,10 @@ from os import path, makedirs
 import logging
 import json
 
-import pandas as pd
-
 from dependencynet.schema import SchemaEncoder
 from dependencynet.tree_model import TreeModelBuilder, TreeModelEncoder
+from dependencynet.datasource.loaders.resourcesloader import ResourcesLoader
+from dependencynet.datasource.loaders.levelsloader import LevelsLoader
 
 
 class Model:
@@ -115,11 +115,14 @@ class ModelBuilder():
     @classmethod
     def render(self):
         self.logger.debug('render getting levels')
-        levels_datasets = self.__extract_hierarchy(self.source_df, self.schema)
+        loader = LevelsLoader(self.schema, self.source_df)
+        levels_datasets = loader.extract_all()
+
         df_parent = levels_datasets[2]  # FIXME last item of list
 
         self.logger.debug('render getting datasets')
-        resources_datasets = self.__extract_resources(self.source_df, df_parent, self.schema)
+        loader = ResourcesLoader(self.schema, self.source_df, df_parent)
+        resources_datasets = loader.extract_all()
 
         self.logger.debug('render building tree model')
         tree_model = TreeModelBuilder().from_canonical(levels_datasets, resources_datasets) \
@@ -129,152 +132,6 @@ class ModelBuilder():
         self.logger.debug('render creating resulting model')
 
         return Model(self.schema, levels_datasets, resources_datasets, tree_model)
-
-    # ---- private
-
-    @classmethod
-    def __extract_items_root(self, df, keys, id_pattern):
-        self.logger.debug('extract_items_root keys=%s id_pattern=%s', keys, id_pattern)
-
-        id_key = keys[-1]
-        pos_key = 'pos'
-        self.logger.debug('extract_items_root id_key=%s', id_key)
-
-        items_df = df.drop_duplicates(subset=keys)[keys]
-
-        def get_pos():
-            i = 0
-            while i < len(items_df.index):
-                yield i
-                i += 1
-
-        items_df[pos_key] = pd.DataFrame(list(get_pos()), index=items_df.index)
-        items_df[pos_key] = items_df[pos_key] + 1
-
-        def format_id(p):
-            id = id_pattern.format(id=p)
-            return id
-
-        items_df['id'] = items_df[pos_key].apply(lambda x: format_id(x))
-        items_df['label'] = items_df.apply(lambda row: "%s %s" % (row['id'], row[id_key]), axis=1)
-
-        self.logger.info('extract_items_root keys=%s id_pattern=%s => shape=%s', keys, id_pattern, items_df.shape)
-
-        return items_df
-
-    @classmethod
-    def __extract_items_non_root(self, df, keys, id_pattern, parent_df):
-        self.logger.debug('extract_items_non_root keys=%s id_pattern=%s', keys, id_pattern)
-
-        id_key = keys[-1]
-        parent_keys = keys[0:-1]
-        self.logger.debug('extract_items_non_root id_key=%s', id_key)
-
-        pos_key = 'pos'
-
-        items_df = df.drop_duplicates(subset=keys)[keys]
-
-        items_df[pos_key] = items_df.groupby(parent_keys).cumcount()
-        items_df[pos_key] = items_df[pos_key] + 1
-
-        # enrich with parent id
-        items_df = pd.merge(items_df, parent_df[parent_keys + ['id']], on=parent_keys)
-        columns_mapping = {
-            'id': 'id_parent'
-        }
-        items_df = items_df.rename(columns=columns_mapping)
-
-        items_df['id'] = items_df.apply(
-                    lambda row: id_pattern.format(id=row[pos_key], id_parent=row['id_parent']),
-                    axis=1)
-        items_df['label'] = items_df.apply(lambda row: "%s %s" % (row['id'], row[id_key]), axis=1)
-
-        self.logger.info('extract_items_root keys=%s id_pattern=%s => shape=%s', keys, id_pattern, items_df.shape)
-
-        return items_df
-
-    @classmethod
-    def __extract_hierarchy(self, source_df, schema):
-        dfs = []
-        self.logger.debug('extract_hierarchy schema=%s', schema)
-
-        keys = schema.levels_keys()
-        marks = schema.levels_marks()
-
-        pattern = '%s{id:02d}' % marks[0]
-
-        df_parent = self.__extract_items_root(source_df, [keys[0]], pattern)
-        dfs.append(df_parent)
-        for i in range(1, len(keys)):
-            df_i = self.__extract_items_non_root(source_df, keys[0:i+1], '{id_parent}%s{id:02d}' % marks[i], df_parent)
-            dfs.append(df_i)
-            df_parent = df_i
-        return dfs
-
-    @classmethod
-    def __extract_resources(self, source_df, df_parent, schema):
-        dfs = {}
-        self.logger.debug('extract_resource schema=%s', schema)
-
-        keys = schema.resources_keys()
-        for key in keys:
-            mark = schema.resource_mark(key)
-            df = self.__extract_resource(source_df,
-                                         key,
-                                         '{id_parent}%s{id:02d}' % mark,
-                                         df_parent,
-                                         schema.levels_keys())
-            dfs[key] = df
-        return dfs
-
-    @classmethod
-    def __extract_resource(self, df, id_key, id_pattern, parent_df,
-                           parent_keys, explode=False, delimiter=','):  # FIXMZ schema
-        self.logger.debug(f'__extract_resource columns={df.columns}')
-
-        if id_key not in df.columns:
-            raise RuntimeError(f'{id_key} not found in datasource - columns:{df.columns}')
-
-        self.logger.debug('__extract_resource key=%s id_pattern=%s', id_key, id_pattern)
-
-        self.logger.debug('__extract_resource id_key=%s', id_key)
-
-        pos_key = 'pos'
-
-        # the key to this item : parent_keys + id_key
-        reference_keys = parent_keys.copy()
-        reference_keys.append(id_key)
-        self.logger.debug('__extract_resource reference_keys=%s', reference_keys)
-        items_df = df.drop_duplicates(subset=reference_keys)[reference_keys]
-
-        # ignore item when no value is provided
-        items_df.dropna(subset=[id_key], inplace=True)
-
-        # unpack column consisting ina list of items into multiple lines
-        explode = True  # FIXME
-        if explode:  # TODO unpack
-            items_df[id_key] = items_df[id_key].str.strip().str.split(delimiter)
-            items_df = items_df.explode(id_key)
-
-        items_df[pos_key] = items_df.groupby(parent_keys).cumcount()
-        items_df[pos_key] = items_df[pos_key] + 1
-
-        # enrich with parent id
-        items_df = pd.merge(items_df, parent_df[parent_keys + ['id']], on=parent_keys)
-        columns_mapping = {
-            'id': 'id_parent'
-        }
-        items_df = items_df.rename(columns=columns_mapping)
-
-        items_df['id'] = items_df.apply(
-                    lambda row: id_pattern.format(id=row[pos_key], id_parent=row['id_parent']),
-                    axis=1)
-        items_df['label'] = items_df.apply(lambda row: "%s %s" % (row['id'], row[id_key]), axis=1)
-
-        self.logger.info('__extract_resource keys=%s id_pattern=%s => shape=%s',
-                         reference_keys, id_pattern, items_df.shape)
-
-        return items_df
 
 
 class ModelStorageService:

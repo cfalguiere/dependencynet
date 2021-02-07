@@ -48,43 +48,22 @@ def test_model_builder_towns(source_data_towns, schema_towns):
     df_area = level_dfs[0]
     assert df_area.shape == (2, 4)
     assert list(df_area.columns) == ['area', 'pos', 'id', 'label']
-    assert df_area['area'][4] == 'Asia'
-    assert df_area['pos'][4] == 2
-    assert df_area['id'][4] == 'A02'
     assert df_area['label'][4] == 'A02 Asia'
 
     df_country = level_dfs[1]
     assert df_country.shape == (4, 6)
     assert list(df_country.columns) == ['area', 'country', 'pos', 'id_parent', 'id', 'label']
-    assert df_country['area'][2] == 'Europe'
-    assert df_country['country'][2] == 'Italia'
-    assert df_country['pos'][2] == 3
-    assert df_country['id_parent'][2] == 'A01'
-    assert df_country['id'][2] == 'A01C03'
     assert df_country['label'][2] == 'A01C03 Italia'
 
     df_town = level_dfs[2]
     assert df_town.shape == (5, 7)
     assert list(df_town.columns) == ['area', 'country', 'town', 'pos', 'id_parent', 'id', 'label']
-    assert df_town['area'][1] == 'Europe'
-    assert df_town['country'][1] == 'France'
-    assert df_town['town'][1] == 'Lyon'
-    assert df_town['pos'][1] == 2
-    assert df_town['id_parent'][1] == 'A01C01'
-    assert df_town['id'][1] == 'A01C01T02'
     assert df_town['label'][1] == 'A01C01T02 Lyon'
 
     df_monument = resource_dfs['monument']
     assert df_monument.shape == (6, 8)
     i_paris = 0
     assert list(df_monument.columns) == ['area', 'country', 'town', 'monument', 'pos', 'id_parent', 'id', 'label']
-    assert df_monument['area'][i_paris] == 'Europe'
-    assert df_monument['country'][i_paris] == 'France'
-    assert df_monument['town'][i_paris] == 'Paris'
-    assert df_monument['monument'][i_paris] == 'Eiffel Tower'  # FIXME
-    assert df_monument['pos'][i_paris] == 1
-    assert df_monument['id_parent'][i_paris] == 'A01C01T01'
-    assert df_monument['id'][i_paris] == 'A01C01T01M01'
     assert df_monument['label'][i_paris] == 'A01C01T01M01 Eiffel Tower'
 
     # TODO tester lyon sans monument

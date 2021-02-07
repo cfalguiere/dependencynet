@@ -30,7 +30,11 @@ class Schema:
 
     @classmethod
     def resource_mark(self, key):
-        return self.resources[key]  # FIXME return mark directly
+        return self.resources[key]['mark']
+
+    @classmethod
+    def resource_definition(self, key):
+        return self.resources[key]
 
 
 class SchemaBuilder:
@@ -52,7 +56,7 @@ class SchemaBuilder:
     def resource(self, label, mark, explode=False, delimiter='|'):
         # TODI check whether mark is unique
         # TODO which is key
-        self.resources[label] = mark
+        self.resources[label] = {'mark': mark, 'explode': explode, 'delimiter': delimiter}
         return self
 
     @classmethod
