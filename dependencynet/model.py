@@ -84,9 +84,10 @@ class Model:
                         eltr_name = "%s_dict" % name
                         lr = v2[eltr_name]
                         lines.append(f"            has {len(lr)} {name}(s)")
-                        lines.append(f"               {', '.join([str(i) for i in [*lr]])}")
-                        for kr, vr in lr.items():
-                            lines.append(f"                 {name} {kr}: {vr[name]}")
+                        if len(lr) > 0:
+                            lines.append(f"               {', '.join([str(i) for i in [*lr]])}")
+                            for kr, vr in lr.items():
+                                lines.append(f"                 {name} {kr}: {vr[name]}")
 
         return lines
 
@@ -227,7 +228,8 @@ class ModelBuilder():
         return dfs
 
     @classmethod
-    def __extract_resource(self, df, id_key, id_pattern, parent_df, parent_keys):
+    def __extract_resource(self, df, id_key, id_pattern, parent_df,
+                           parent_keys, explode=False, delimiter=','):  # FIXMZ schema
         self.logger.debug(f'__extract_resource columns={df.columns}')
 
         if id_key not in df.columns:
@@ -239,10 +241,20 @@ class ModelBuilder():
 
         pos_key = 'pos'
 
+        # the key to this item : parent_keys + id_key
         reference_keys = parent_keys.copy()
         reference_keys.append(id_key)
         self.logger.debug('__extract_resource reference_keys=%s', reference_keys)
         items_df = df.drop_duplicates(subset=reference_keys)[reference_keys]
+
+        # ignore item when no value is provided
+        items_df.dropna(subset=[id_key], inplace=True)
+
+        # unpack column consisting ina list of items into multiple lines
+        explode = True  # FIXME
+        if explode:  # TODO unpack
+            items_df[id_key] = items_df[id_key].str.strip().str.split(delimiter)
+            items_df = items_df.explode(id_key)
 
         items_df[pos_key] = items_df.groupby(parent_keys).cumcount()
         items_df[pos_key] = items_df[pos_key] + 1
@@ -259,7 +271,8 @@ class ModelBuilder():
                     axis=1)
         items_df['label'] = items_df.apply(lambda row: "%s %s" % (row['id'], row[id_key]), axis=1)
 
-        self.logger.info('__extract_resource keys=%s id_pattern=%s => shape=%s', reference_keys, id_pattern, items_df.shape)
+        self.logger.info('__extract_resource keys=%s id_pattern=%s => shape=%s',
+                         reference_keys, id_pattern, items_df.shape)
 
         return items_df
 

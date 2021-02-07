@@ -75,17 +75,17 @@ def test_model_builder_towns(source_data_towns, schema_towns):
     assert df_town['label'][1] == 'A01C01T02 Lyon'
 
     df_monument = resource_dfs['monument']
-    assert df_monument.shape == (5, 8)
+    assert df_monument.shape == (6, 8)
     i_paris = 0
     assert list(df_monument.columns) == ['area', 'country', 'town', 'monument', 'pos', 'id_parent', 'id', 'label']
     assert df_monument['area'][i_paris] == 'Europe'
     assert df_monument['country'][i_paris] == 'France'
     assert df_monument['town'][i_paris] == 'Paris'
-    assert df_monument['monument'][i_paris] == 'Eiffel Tower,Louvre Museum'  # FIXME
+    assert df_monument['monument'][i_paris] == 'Eiffel Tower'  # FIXME
     assert df_monument['pos'][i_paris] == 1
     assert df_monument['id_parent'][i_paris] == 'A01C01T01'
     assert df_monument['id'][i_paris] == 'A01C01T01M01'
-    assert df_monument['label'][i_paris] == 'A01C01T01M01 Eiffel Tower,Louvre Museum'
+    assert df_monument['label'][i_paris] == 'A01C01T01M01 Eiffel Tower'
 
     # TODO tester lyon sans monument
 
@@ -148,14 +148,14 @@ def test_model_storage_towns(source_data_towns, schema_towns, root_location):
 
 
 # Tests
-def ttttest_pretty_print(source_data_towns, schema_towns):
+def test_pretty_print(source_data_towns, schema_towns):
     model = ModelBuilder().from_compact(source_data_towns) \
                           .with_schema(schema_towns) \
                           .render()
 
     lines = model.pretty_print()
 
-    assert len(lines) == 25
+    assert len(lines) == 40
     assert lines[0] == 'there are 2 area(s)'
     assert lines[1] == '  A01, A02'
     assert lines[2] == '  area A01: Europe'
@@ -164,7 +164,14 @@ def ttttest_pretty_print(source_data_towns, schema_towns):
     assert lines[5] == '      country A01C01: France'
     assert lines[6] == '        has 2 town(s)'
     assert lines[7] == '          A01C01T01, A01C01T02'
-    assert lines[9] == '          town A01C01T02: Lyon'
+    assert lines[8] == '          town A01C01T01: Paris'
+    assert lines[9] == '            has 2 monument(s)'
+    assert lines[10] == '               A01C01T01M01, A01C01T01M02'
+    assert lines[11] == '                 monument A01C01T01M01: Eiffel Tower'
+    assert lines[12] == '                 monument A01C01T01M02: Louvre Museum'
+    assert lines[13] == '          town A01C01T02: Lyon'
+    assert lines[14] == '            has 0 monument(s)'
+    assert lines[15] == '      country A01C02: UK'
 
-# TODO res
+
 # TODO given model name

@@ -68,10 +68,12 @@ def test_full_tree_model_towns(model_towns, schema_towns):
     assert a1c1t2['area'] == 'Europe'
     assert a1c1t2['country'] == 'France'
     assert a1c1t2['town'] == 'Lyon'
+    # Lyon does not have any monument
+    assert 'monument_dict' not in a1c1t2['town']
     # FIXME tester lyon sans monument
     a1c1t1 = a1c1['town_dict']['A01C01T01']
     a1c1t1m1 = a1c1t1['monument_dict']['A01C01T01M01']
     assert a1c1t1m1['area'] == 'Europe'
     assert a1c1t1m1['country'] == 'France'
     assert a1c1t1m1['town'] == 'Paris'
-    assert a1c1t1m1['monument'] == 'Eiffel Tower,Louvre Museum'  # FIXME
+    assert a1c1t1m1['monument'] == 'Eiffel Tower'
