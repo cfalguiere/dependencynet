@@ -53,10 +53,11 @@ class SchemaBuilder:
         return self
 
     @classmethod
-    def resource(self, label, mark, explode=False, delimiter='|'):
+    def resource(self, label, mark, role='', explode=False, delimiter='|'):
         # TODI check whether mark is unique
         # TODO which is key
-        self.resources[label] = {'mark': mark, 'explode': explode, 'delimiter': delimiter}
+        self.resources[label] = {'mark': mark, 'role': role,
+                                 'explode': explode, 'delimiter': delimiter}
         return self
 
     @classmethod

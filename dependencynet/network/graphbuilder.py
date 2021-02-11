@@ -27,6 +27,20 @@ class ResourceNode(CustomNode):
         self.category = category
 
 
+class InputNode(ResourceNode):
+    def __init__(self, properties, category):
+        super().__init__(properties, f'{category} input')
+        self.category = category
+        self.match_id = properties[category]
+
+
+class OutputNode(ResourceNode):
+    def __init__(self, properties, category):
+        super().__init__(properties, f'{category} output')
+        self.category = category
+        self.match_id = properties[category]
+
+
 class GraphModel():
 
     def __init__(self, G):
@@ -71,7 +85,10 @@ class GraphBuilder():
 
         self.logger.info('creating edges between lower level and resource')
         self.logger.debug(f'lower level {keys[-1]} resource_key {resource_key}')
-        self.add_edges_from(df, keys[-1], resource_key)
+        role = self.model.schema.resource_definition(resource_key)['role']
+        self.logger.debug(f'role={role}')
+        preceding = (role == 'INPUT')  # FIXME magic string
+        self.add_edges_from(df, keys[-1], resource_key, preceding=preceding)
 
     @classmethod
     def add_nodes_from(self, df, category):
@@ -82,17 +99,27 @@ class GraphBuilder():
         self.G.add_nodes_from(wf_nodes)
 
     @classmethod
-    def add_edges_from(self, target_df, source_category, target_category, on_key='id', on_parent_key='id_parent'):
+    def add_edges_from(self, target_df, source_category, target_category,
+                       preceding=False, on_key='id', on_parent_key='id_parent'):
         source_nodes_by_id = {n.data[on_key]: n for n in self.G.nodes() if source_category in n.classes}
         target_nodes_by_id = {n.data[on_key]: n for n in self.G.nodes() if target_category in n.classes}
-        edge_label = f'{source_category}_{target_category}'
+        self.logger.debug(f'preceding={preceding}')
+        if preceding:
+            edge_label = f'{target_category}_{source_category}'
+        else:
+            edge_label = f'{source_category}_{target_category}'
+        self.logger.debug(f'edge_label={edge_label}')
 
         def add_edge(row):
             id_target = row[on_key]
             id_source = row[on_parent_key]
             self.logger.debug(f'{id_source} -> {id_target}')
             self.logger.debug(f'{source_nodes_by_id[id_source]} -> {target_nodes_by_id[id_target]}')
-            self.G.add_edge(source_nodes_by_id[id_source], target_nodes_by_id[id_target], label=edge_label)
+            self.logger.debug(f'preceding={preceding}')
+            if preceding:
+                self.G.add_edge(target_nodes_by_id[id_target], source_nodes_by_id[id_source], label=edge_label)
+            else:
+                self.G.add_edge(source_nodes_by_id[id_source], target_nodes_by_id[id_target], label=edge_label)
 
         target_df.apply(add_edge, axis=1)
 
