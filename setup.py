@@ -5,8 +5,9 @@ with open('README.md', 'r', encoding='utf-8') as file:
 
 setup(
     name='dependencynet',
-    packages=find_packages(include=['dependencynet']),
-    version='0.1.1',
+    packages=find_packages(include=['dependencynet', 'dependencynet.network',
+                                    'dependencynet.datasource', 'dependencynet.loaders']),
+    version='0.1.3',
     description='represent and analyse dependency graphs (networks)',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -16,7 +17,7 @@ setup(
     url='https://github.com/cfalguiere/dependencynet',
     platforms=['Any'],
     py_modules=['dependencynet'],
-    install_requires=[],
+    install_requires=['pandas', 'networkx', 'ipycytoscape', 'pyyed'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
