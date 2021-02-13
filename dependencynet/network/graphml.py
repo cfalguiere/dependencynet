@@ -57,13 +57,14 @@ class GraphMLConverter():
 
         for node in self.graph_model.G.nodes(data=True):
             n = node[0]
-            g.add_node(n.data["id"],
-                       label=n.data["label"],
-                       shape=shapes[n.category],
-                       shape_fill=colors[n.category],
+            category = n.data['category']
+            g.add_node(n.data['id'],
+                       label=n.data['label'],
+                       shape=shapes[category],
+                       shape_fill=colors[category],
                        font_size='8',
                        font_style='bold',
-                       width=widths[n.category],
+                       width=widths[category],
                        height='30')
 
         for n1, n2 in self.graph_model.G.edges():

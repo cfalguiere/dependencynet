@@ -2,6 +2,7 @@
 This module provides helpers to setup the graph network
 """
 import logging
+import copy
 
 import ipycytoscape
 import networkx as nx
@@ -12,43 +13,83 @@ class CustomNode(ipycytoscape.Node):
         super().__init__()
         self.data['id'] = id
         self.data['label'] = label
+        self.data['role'] = None
         self.classes = classes
 
 
 class LevelNode(CustomNode):
     def __init__(self, properties, category):
         super().__init__(properties['id'], properties['label'], f'{category} level')
-        self.category = category
+        self.data['category'] = category
+        self.data['group'] = 'level'
 
 
 class ResourceNode(CustomNode):
     def __init__(self, properties, category):
         super().__init__(properties['id'], properties['label'], f'{category} resource')
-        self.category = category
+        self.data['category'] = category
+        self.data['group'] = 'resource'
 
 
 class InputNode(ResourceNode):
     def __init__(self, properties, category):
         super().__init__(properties, f'{category} input')
-        self.category = category
+        self.data['role'] = 'input'
         self.data['role_id'] = properties['role_id']
 
 
 class OutputNode(ResourceNode):
     def __init__(self, properties, category):
         super().__init__(properties, f'{category} output')
-        self.category = category
+        self.data['role'] = 'output'
         self.data['role_id'] = properties['role_id']
 
 
 class GraphModel():
+    logger = logging.getLogger(__name__)
 
+    @classmethod
     def __init__(self, G):
         self.G = G
 
-    def copy(self):
-        # TODO unit test
-        return GraphModel(self.G.copy())
+    @classmethod
+    def remove_category(self, category):
+        self.logger.debug(f"removing nodes having category {category}")
+        selected_nodes = [node[0]
+                          for node in self.G.nodes(data=True)
+                          if node[0].data['category'] == category]
+        self.logger.debug(f'selected_nodes {selected_nodes}')
+        self.G.remove_nodes_from(selected_nodes)
+
+    @classmethod
+    def aggregate_level(self, levels_list):
+        self.logger.debug(f"aggregating on level category {levels_list}")
+        ref = None
+
+        jumps = []
+        for l0 in self.G.nodes():
+            self.logger.debug(f"{l0.classes} {l0.data['id']}")
+            ref = l0 if l0.data['category'] in levels_list else ref
+            for l1 in self.G.successors(l0):
+                print(f"--> {l1.classes} {l1.data['id']}")
+                ref = l1 if l1.data['category'] in levels_list else ref
+                for l2 in self.G.successors(l1):
+                    print(f"----> {l2.classes} {l2.data['id']}")
+                    ref = l2 if l2.data['category'] in levels_list else ref
+                    for res in self.G.successors(l2):
+                        print(f"------> {res.classes} {res.data['id']}")
+                        jumps.append((ref, res))
+
+        self.logger.debug(f"adding {len(jumps)} edges")
+        [self.G.add_edge(ref, res) for (ref, res) in jumps]
+
+        self.logger.debug("will remove other levels")
+        selected_nodes = [node[0]
+                          for node in self.G.nodes(data=True)
+                          if node[0].data['group'] == 'level'
+                          and node[0].data['category'] not in levels_list]
+        self.logger.debug(f'selected_nodes {selected_nodes}')
+        self.G.remove_nodes_from(selected_nodes)
 
 
 # TODO pattern builder
