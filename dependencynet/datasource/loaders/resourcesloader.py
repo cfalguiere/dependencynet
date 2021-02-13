@@ -78,6 +78,10 @@ class ResourcesLoader:
                     axis=1)
         items_df['label'] = items_df.apply(lambda row: "%s %s" % (row['id'], row[id_key]), axis=1)
 
+        role_id = self.schema.resource_definition(id_key)['role_id']
+        if role_id is not None:
+            items_df['role_id'] = items_df[id_key]
+
         self.logger.info('__extract_resource keys=%s id_pattern=%s => shape=%s',
                          reference_keys, id_pattern, items_df.shape)
 

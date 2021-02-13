@@ -8,9 +8,10 @@ from json import JSONEncoder
 class Schema:
 
     @classmethod
-    def __init__(self, levels, resources):
+    def __init__(self, levels, resources, connections=None):
         self.levels = levels
         self.resources = resources
+        self.connections = connections
 
     @classmethod
     def __repr__(self):
@@ -36,6 +37,10 @@ class Schema:
     def resource_definition(self, key):
         return self.resources[key]
 
+    @classmethod
+    def connections_pairs(self):
+        return self.connections
+
 
 class SchemaBuilder:
     logger = logging.getLogger(__name__)
@@ -44,6 +49,7 @@ class SchemaBuilder:
     def __init__(self):
         self.levels = {'keys': [], 'marks': []}  # must keep order
         self.resources = {}
+        self.connections = []
 
     @classmethod
     def level(self, label, mark):
@@ -53,17 +59,26 @@ class SchemaBuilder:
         return self
 
     @classmethod
-    def resource(self, label, mark, role='', explode=False, delimiter='|'):
+    def resource(self, label, mark, role=None, role_id=None, explode=False, delimiter='|'):
         # TODI check whether mark is unique
         # TODO which is key
-        self.resources[label] = {'mark': mark, 'role': role,
+        self.resources[label] = {'mark': mark,
+                                 'role': role, 'role_id': role_id,
                                  'explode': explode, 'delimiter': delimiter}
+        return self
+
+    @classmethod
+    def connect(self, left_key, right_key):
+        # TODO unit test
+        # TODI consistent wording for column labels and ids
+        # TODO check whether columns exists and are inpout output
+        self.connections.append((left_key, right_key))
         return self
 
     @classmethod
     def render(self):
         self.logger.info("rendering schema")
-        return Schema(self.levels, self.resources)
+        return Schema(self.levels, self.resources, self.connections)
 
 
 class SchemaStorage:

@@ -31,14 +31,14 @@ class InputNode(ResourceNode):
     def __init__(self, properties, category):
         super().__init__(properties, f'{category} input')
         self.category = category
-        self.match_id = properties[category]
+        self.data['role_id'] = properties['role_id']
 
 
 class OutputNode(ResourceNode):
     def __init__(self, properties, category):
         super().__init__(properties, f'{category} output')
         self.category = category
-        self.match_id = properties[category]
+        self.data['role_id'] = properties['role_id']
 
 
 class GraphModel():
@@ -46,19 +46,57 @@ class GraphModel():
     def __init__(self, G):
         self.G = G
 
+    def copy(self):
+        # TODO unit test
+        return GraphModel(self.G.copy())
+
 
 # TODO pattern builder
 class GraphBuilder():
     logger = logging.getLogger(__name__)
+    # TODO unit tests
 
     @classmethod
-    def __init__(self, model):
+    def __init__(self):
         self.node_class = {}
-        self.model = model
         self.G = nx.DiGraph()
 
     @classmethod
+    def with_types(self, node_class_mapping):
+        self.node_class = node_class_mapping
+        return self
+
+    @classmethod
+    def with_model(self, model):
+        self.model = model
+        return self
+
+    @classmethod
+    def render(self):
+        self.logger.debug('render graph data')
+        self.__build_from_schema()
+        return GraphModel(self.G)
+
+    #  basic operations
+
+    @classmethod
+    def __build_from_schema(self):
+        self.logger.info('adding nodes from levels')
+        self.add_nodes_from_levels()
+        for key in self.model.schema.resources_keys():
+            self.logger.info(f'adding resource nodes {key}')
+            self.add_nodes_from_resource(key)
+        for left, right in self.model.schema.connections_pairs():
+            # FIXME no match - data id contains In or Out
+            self.logger.info(f'adding connection {left} {right}')
+            df = self.model.resource_dataset(right)
+            self.add_edges_from(df, left, right,
+                                on_target_key='role_id', on_source_key='role_id',
+                                graph_key='role_id')
+
+    @classmethod
     def register_node_type(self, category, class_name, color='black'):
+        # FIXME unused color
         self.node_class[category] = class_name
 
     @classmethod
@@ -88,6 +126,7 @@ class GraphBuilder():
         role = self.model.schema.resource_definition(resource_key)['role']
         self.logger.debug(f'role={role}')
         preceding = (role == 'INPUT')  # FIXME magic string
+        # FIXME juste inverser le passage des parametres
         self.add_edges_from(df, keys[-1], resource_key, preceding=preceding)
 
     @classmethod
@@ -100,9 +139,10 @@ class GraphBuilder():
 
     @classmethod
     def add_edges_from(self, target_df, source_category, target_category,
-                       preceding=False, on_key='id', on_parent_key='id_parent'):
-        source_nodes_by_id = {n.data[on_key]: n for n in self.G.nodes() if source_category in n.classes}
-        target_nodes_by_id = {n.data[on_key]: n for n in self.G.nodes() if target_category in n.classes}
+                       preceding=False, graph_key='id',
+                       on_source_key='id_parent', on_target_key='id'):
+        source_nodes_by_id = {n.data[graph_key]: n for n in self.G.nodes() if source_category in n.classes}
+        target_nodes_by_id = {n.data[graph_key]: n for n in self.G.nodes() if target_category in n.classes}
         self.logger.debug(f'preceding={preceding}')
         if preceding:
             edge_label = f'{target_category}_{source_category}'
@@ -111,8 +151,8 @@ class GraphBuilder():
         self.logger.debug(f'edge_label={edge_label}')
 
         def add_edge(row):
-            id_target = row[on_key]
-            id_source = row[on_parent_key]
+            id_source = row[on_source_key]
+            id_target = row[on_target_key]
             self.logger.debug(f'{id_source} -> {id_target}')
             self.logger.debug(f'{source_nodes_by_id[id_source]} -> {target_nodes_by_id[id_target]}')
             self.logger.debug(f'preceding={preceding}')
@@ -122,8 +162,3 @@ class GraphBuilder():
                 self.G.add_edge(source_nodes_by_id[id_source], target_nodes_by_id[id_target], label=edge_label)
 
         target_df.apply(add_edge, axis=1)
-
-    @classmethod
-    def render(self):
-        self.logger.debug('render graph data')
-        return GraphModel(self.G)
