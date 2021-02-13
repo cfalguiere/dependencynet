@@ -8,7 +8,7 @@ setup(
     packages=find_packages(include=['dependencynet',
                                     'dependencynet.network',
                                     'dependencynet.datasource',
-                                    'dependencynet.datasource.loaders']),
+                                    'dependencynet.datasource.core']),
     version='0.1.4',
     description='represent and analyse dependency graphs (networks)',
     long_description=long_description,

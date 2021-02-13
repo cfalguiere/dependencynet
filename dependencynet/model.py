@@ -7,8 +7,8 @@ import json
 
 from dependencynet.schema import SchemaEncoder
 from dependencynet.tree_model import TreeModelBuilder, TreeModelEncoder
-from dependencynet.datasource.loaders.resourcesloader import ResourcesLoader
-from dependencynet.datasource.loaders.levelsloader import LevelsLoader
+from dependencynet.datasource.core.resourcesloader import ResourcesLoader
+from dependencynet.datasource.core.levelsloader import LevelsLoader
 
 
 class Model:
