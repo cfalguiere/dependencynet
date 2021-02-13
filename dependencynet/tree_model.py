@@ -3,7 +3,6 @@ This module provides helpers to setup the data model tree
 """
 import logging
 from collections import defaultdict
-from json import JSONEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -89,13 +88,3 @@ class TreeModelBuilder():
                                 parent_tree[eltr_name][kr] = records[0]
 
         return tree
-
-
-class TreeModelEncoder(JSONEncoder):
-    def default(self, o):
-        return o.tree
-
-    # def from_json(json_object):
-    #    if 'fname' in json_object:
-    #       return FileItem(json_object['fname'])
-    # f = JSONDecoder(object_hook = from_json).decode('{"fname": "/foo/bar"}')

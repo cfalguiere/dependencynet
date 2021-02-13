@@ -2,7 +2,6 @@
 This module provides helpers to manage the data schema
 """
 import logging
-from json import JSONEncoder
 
 
 class Schema:
@@ -79,28 +78,3 @@ class SchemaBuilder:
     def render(self):
         self.logger.info("rendering schema")
         return Schema(self.levels, self.resources, self.connections)
-
-
-class SchemaStorage:
-    logger = logging.getLogger(__name__)
-
-    @staticmethod
-    def load(self, schema, filename, sep=','):
-        # TODO
-        pass
-
-    @staticmethod
-    def save(self, schema, filename, sep=','):
-        # TODO
-        pass
-
-
-class SchemaEncoder(JSONEncoder):
-    def default(self, o):
-        properties = {'levels': o.levels, 'resources': o.resources}
-        return properties
-
-    # def from_json(json_object):
-    #    if 'fname' in json_object:
-    #       return FileItem(json_object['fname'])
-    # f = JSONDecoder(object_hook = from_json).decode('{"fname": "/foo/bar"}')

@@ -1,7 +1,7 @@
 # third party import
 
 # module import
-from dependencynet.schema import SchemaBuilder, SchemaEncoder
+from dependencynet.schema import SchemaBuilder
 
 # TODO Schema SchemaOperations
 
@@ -69,12 +69,3 @@ def test_schema_resource_definition_towns(schema_towns):
     definition = schema_towns.resource_definition('monument')
     assert definition['explode'] is True
     assert definition['delimiter'] == ','
-
-
-# Tests
-def test_schema_encoder(schema_towns):
-    encoded = SchemaEncoder().encode(schema_towns)
-
-    assert 'levels' in encoded
-    assert 'area' in encoded
-    assert 'resources' in encoded
