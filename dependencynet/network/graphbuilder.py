@@ -64,7 +64,51 @@ class GraphModel():
 
     @classmethod
     def aggregate_level(self, levels_list):
+        # TODO cannot remove first level - need to be aware of the schema
         self.logger.debug(f"aggregating on level category {levels_list}")
+
+        def is_level(node): return node.data['group'] == 'level'
+        def should_keep(node): return node.data['category'] in levels_list
+
+        # detect nodes that should be replaced by their parent
+        # data=True
+        replacements = []
+        for node in self.G.nodes():
+            self.logger.debug(f"{node.classes} {node.data['id']}")
+            if is_level(node) and not should_keep(node):
+                self.logger.debug(f"{node.classes} {node.data['id']}")
+                parent_node = None
+                current_node = node
+                while parent_node is None:
+                    for pred_node in self.G.predecessors(current_node):
+                        if is_level(pred_node):
+                            current_node = pred_node
+                            if should_keep(pred_node):
+                                parent_node = pred_node
+                                replacements.append((node, parent_node))
+
+        self.logger.debug(f"adding {len(replacements)} nodes")
+        for (node, parent) in replacements:
+            # inputs
+            for pred_node in self.G.predecessors(node):
+                if not is_level(pred_node):
+                    self.G.add_edge(pred_node, parent)
+            # other resources
+            for next_node in self.G.successors(node):
+                if not is_level(next_node):
+                    self.G.add_edge(parent, next_node)
+
+        self.logger.debug("will remove extra levels")
+        selected_nodes = [node[0]
+                          for node in self.G.nodes(data=True)
+                          if is_level(node[0]) and not should_keep(node[0])]
+        self.logger.debug(f'selected_nodes {selected_nodes}')
+        self.G.remove_nodes_from(selected_nodes)
+
+    @classmethod
+    def aggregate_level_old(self, levels_list):
+        self.logger.debug(f"aggregating on level category {levels_list}")
+
         ref = None
 
         jumps = []
@@ -72,13 +116,13 @@ class GraphModel():
             self.logger.debug(f"{l0.classes} {l0.data['id']}")
             ref = l0 if l0.data['category'] in levels_list else ref
             for l1 in self.G.successors(l0):
-                print(f"--> {l1.classes} {l1.data['id']}")
+                self.logger.debug(f"--> {l1.classes} {l1.data['id']}")
                 ref = l1 if l1.data['category'] in levels_list else ref
                 for l2 in self.G.successors(l1):
-                    print(f"----> {l2.classes} {l2.data['id']}")
+                    self.logger.debug(f"----> {l2.classes} {l2.data['id']}")
                     ref = l2 if l2.data['category'] in levels_list else ref
                     for res in self.G.successors(l2):
-                        print(f"------> {res.classes} {res.data['id']}")
+                        self.logger.debug(f"------> {res.classes} {res.data['id']}")
                         jumps.append((ref, res))
 
         self.logger.debug(f"adding {len(jumps)} edges")
@@ -97,15 +141,15 @@ class GraphModel():
 
     @classmethod
     def merge_connection(self, left_name, right_name, connect_id_name):
-        # FIXME replace with schema identification
-        self.logger.debug(f"merging left a,d right side of the connection {connect_id_name}")
+        # FIXME replace with schema identification and connect_id_name -> connection_name
+        self.logger.debug(f"merging left and right side of the connection {connect_id_name}")
 
         merges = []
         for node in self.G.nodes():
             self.logger.debug(f"{node.classes} {node.data['id']}")
             if node.data['category'] == left_name:
                 for paired_node in self.G.successors(node):
-                    print(f"--> {paired_node.classes} {paired_node.data['id']}")
+                    self.logger.debug(f"--> {paired_node.classes} {paired_node.data['id']}")
                     if paired_node.data['category'] == right_name:
                         connect_id = paired_node.data['connect_id']
                         merges.append((node, paired_node))
@@ -123,6 +167,27 @@ class GraphModel():
         self.logger.debug("will remove extra categories")
         self.remove_category(left_name)
         self.remove_category(right_name)
+
+    @classmethod
+    def fold_category(self, category, hide_inner=False):
+        self.logger.debug(f"folding category {category}")
+
+        merges = []
+        for node in self.G.nodes():
+            if node.data['category'] == category:
+                self.logger.debug(f"{node.classes} {node.data['id']}")
+                merges.append(node)
+
+        self.logger.debug(f"adding {len(merges)} edges")
+        for node in merges:
+            for previous_node in self.G.predecessors(node):
+                for next_node in self.G.successors(node):
+                    is_accepted = previous_node != next_node or not hide_inner
+                    if is_accepted:
+                        self.G.add_edge(previous_node, next_node)
+
+        self.logger.debug("will remove extra category")
+        self.remove_category(category)
 
 
 # TODO pattern builder
