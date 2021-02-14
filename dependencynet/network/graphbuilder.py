@@ -2,7 +2,6 @@
 This module provides helpers to setup the graph network
 """
 import logging
-import copy
 
 import ipycytoscape
 import networkx as nx
@@ -95,6 +94,35 @@ class GraphModel():
                           if is_level(node) and should_ignore(node)]
         self.logger.debug(f'selected_nodes {selected_nodes}')
         self.G.remove_nodes_from(selected_nodes)
+
+    @classmethod
+    def merge_connection(self, left_name, right_name, connect_id_name):
+        # FIXME replace with schema identification
+        self.logger.debug(f"merging left a,d right side of the connection {connect_id_name}")
+
+        merges = []
+        for node in self.G.nodes():
+            self.logger.debug(f"{node.classes} {node.data['id']}")
+            if node.data['category'] == left_name:
+                for paired_node in self.G.successors(node):
+                    print(f"--> {paired_node.classes} {paired_node.data['id']}")
+                    if paired_node.data['category'] == right_name:
+                        connect_id = paired_node.data['connect_id']
+                        merges.append((node, paired_node))
+
+        self.logger.debug(f"adding {len(merges)} nodes")
+        for (left, right) in merges:
+            connect_id = left.data['connect_id']
+            flight = ResourceNode({'id': connect_id, 'label': connect_id}, connect_id_name)
+            self.G.add_node(flight)
+            for previous_node in self.G.predecessors(left):
+                self.G.add_edge(previous_node, flight)
+            for next_node in self.G.successors(right):
+                self.G.add_edge(flight, next_node)
+
+        self.logger.debug("will remove extra categories")
+        self.remove_category(left_name)
+        self.remove_category(right_name)
 
 
 # TODO pattern builder

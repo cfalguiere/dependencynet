@@ -92,4 +92,18 @@ class StyleBuilder():
             self.graph_style.append(selecter)
             i += 1
 
+        i = 0
+        for (kl, kr) in self.schema.connections_pairs():
+            k = self.schema.resource_definition(kl)['connect_id_name']
+            bgcolor = list(self.colors.values())[i]
+            selecter = {
+                            'selector': f'node.{k}',
+                            'css': {
+                                'color': 'black',
+                                'background-color': bgcolor
+                            }
+                        }
+            self.graph_style.append(selecter)
+            i += 1
+
         return self.graph_style
