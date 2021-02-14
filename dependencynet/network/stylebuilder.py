@@ -66,6 +66,7 @@ class StyleBuilder():
 
     @classmethod
     def render(self):
+        # TODO manage too many colors
         self.graph_style = self.style_template()
         i = 0
         for k in self.schema.levels_keys():
@@ -92,7 +93,6 @@ class StyleBuilder():
             self.graph_style.append(selecter)
             i += 1
 
-        i = 0
         for (kl, kr) in self.schema.connections_pairs():
             k = self.schema.resource_definition(kl)['connect_id_name']
             bgcolor = list(self.colors.values())[i]
