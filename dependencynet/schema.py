@@ -58,19 +58,20 @@ class SchemaBuilder:
         return self
 
     @classmethod
-    def resource(self, label, mark, role=None, role_id=None, explode=False, delimiter='|'):
+    def resource(self, label, mark, role=None, connect_id_name=None, explode=False, delimiter='|'):
         # TODI check whether mark is unique
         # TODO which is key
         self.resources[label] = {'mark': mark,
-                                 'role': role, 'role_id': role_id,
+                                 'role': role, 'connect_id_name': connect_id_name,
                                  'explode': explode, 'delimiter': delimiter}
         return self
 
     @classmethod
     def connect(self, left_key, right_key):
         # TODO unit test
-        # TODI consistent wording for column labels and ids
+        # TODO:  consistent wording for column labels and ids
         # TODO check whether columns exists and are inpout output
+        # TODO structure for name, left, right
         self.connections.append((left_key, right_key))
         return self
 

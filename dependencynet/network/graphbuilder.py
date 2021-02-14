@@ -32,17 +32,19 @@ class ResourceNode(CustomNode):
 
 
 class InputNode(ResourceNode):
-    def __init__(self, properties, category):
+    def __init__(self, properties, category, connect_id_name):
         super().__init__(properties, f'{category} input')
+        self.data['category'] = category  # override FIXMZ role in concat
         self.data['role'] = 'input'
-        self.data['role_id'] = properties['role_id']
+        self.data['connect_id'] = properties[connect_id_name]
 
 
 class OutputNode(ResourceNode):
-    def __init__(self, properties, category):
+    def __init__(self, properties, category, connect_id_name):
         super().__init__(properties, f'{category} output')
+        self.data['category'] = category   # override FIXMZ role in concat
         self.data['role'] = 'output'
-        self.data['role_id'] = properties['role_id']
+        self.data['connect_id'] = properties[connect_id_name]
 
 
 class GraphModel():
@@ -84,10 +86,13 @@ class GraphModel():
         [self.G.add_edge(ref, res) for (ref, res) in jumps]
 
         self.logger.debug("will remove other levels")
+
+        def is_level(node): return node[0].data['group'] == 'level'
+        def should_ignore(node): return node[0].data['category'] not in levels_list
+
         selected_nodes = [node[0]
                           for node in self.G.nodes(data=True)
-                          if node[0].data['group'] == 'level'
-                          and node[0].data['category'] not in levels_list]
+                          if is_level(node) and should_ignore(node)]
         self.logger.debug(f'selected_nodes {selected_nodes}')
         self.G.remove_nodes_from(selected_nodes)
 
@@ -131,9 +136,14 @@ class GraphBuilder():
             # FIXME no match - data id contains In or Out
             self.logger.info(f'adding connection {left} {right}')
             df = self.model.resource_dataset(right)
+            left_definition = self.model.schema.resource_definition(left)
+            right_definition = self.model.schema.resource_definition(right)
+            # FIXME connect_id_name magic string
+            # TODO insulate connection management and base class
             self.add_edges_from(df, left, right,
-                                on_target_key='role_id', on_source_key='role_id',
-                                graph_key='role_id')
+                                on_target_key=left_definition['connect_id_name'],
+                                on_source_key=right_definition['connect_id_name'],
+                                graph_key='connect_id')
 
     @classmethod
     def register_node_type(self, category, class_name, color='black'):

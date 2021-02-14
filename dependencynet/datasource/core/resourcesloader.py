@@ -78,9 +78,10 @@ class ResourcesLoader:
                     axis=1)
         items_df['label'] = items_df.apply(lambda row: "%s %s" % (row['id'], row[id_key]), axis=1)
 
-        role_id = self.schema.resource_definition(id_key)['role_id']
-        if role_id is not None:
-            items_df['role_id'] = items_df[id_key]
+        # if this attribute is in a connection, feed the id used as a connection id
+        connect_id_name = self.schema.resource_definition(id_key)['connect_id_name']
+        if connect_id_name is not None:
+            items_df[connect_id_name] = items_df[id_key]
 
         self.logger.info('__extract_resource keys=%s id_pattern=%s => shape=%s',
                          reference_keys, id_pattern, items_df.shape)
