@@ -189,6 +189,26 @@ class GraphModel():
         self.logger.debug("will remove extra category")
         self.remove_category(category)
 
+    @classmethod
+    def summary(self):
+        count_by_class = {}
+        for node in self.G.nodes(data=True):
+            if not node[0].classes in count_by_class:
+                count_by_class[node[0].classes] = 0
+            count_by_class[node[0].classes] += 1
+        return count_by_class
+
+    @classmethod
+    def pretty_print(self):
+        lines = []
+        lines.append('Nodes:')
+        for n in self.G.nodes(data=True):
+            lines.append(f"{n[0].classes} - {n[0].data['label']}")
+        lines.append('')
+        lines.append('Edges:')
+        for e in self.G.edges:
+            lines.append(f"{e[0].classes} {e[0].data['id']} -> {e[1].classes} {e[1].data['id']}")
+        return lines
 
 # TODO pattern builder
 class GraphBuilder():
