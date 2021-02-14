@@ -1,0 +1,6 @@
+area;country;town;monument;flight_in;flight_out
+Europe;France;Paris;Eiffel Tower,Louvre Museum;fl2;fl3
+Europe;France;Lyon;;;fl1
+Europe;UK;London;Tower Bridge,Tower of London;fl4;fl5
+Europe;Italia;Rome;Colosseum;fl1;fl2
+Asia;Japan;Tokyo;Senso-ji;fl3;fl4
