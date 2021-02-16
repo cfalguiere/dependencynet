@@ -210,6 +210,7 @@ class GraphModel():
             lines.append(f"{e[0].classes} {e[0].data['id']} -> {e[1].classes} {e[1].data['id']}")
         return lines
 
+
 # TODO pattern builder
 class GraphBuilder():
     logger = logging.getLogger(__name__)
