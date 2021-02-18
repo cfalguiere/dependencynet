@@ -309,6 +309,7 @@ class GraphBuilder():
         source_nodes_by_id = {n.data[graph_key]: n for n in self.G.nodes() if source_category in n.classes}
         target_nodes_by_id = {n.data[graph_key]: n for n in self.G.nodes() if target_category in n.classes}
         self.logger.debug(f'preceding={preceding}')
+        # FIXME caller should swap parameters
         if preceding:
             edge_label = f'{target_category}_{source_category}'
         else:
@@ -319,11 +320,14 @@ class GraphBuilder():
             id_source = row[on_source_key]
             id_target = row[on_target_key]
             self.logger.debug(f'{id_source} -> {id_target}')
-            self.logger.debug(f'{source_nodes_by_id[id_source]} -> {target_nodes_by_id[id_target]}')
             self.logger.debug(f'preceding={preceding}')
-            if preceding:
-                self.G.add_edge(target_nodes_by_id[id_target], source_nodes_by_id[id_source], label=edge_label)
-            else:
-                self.G.add_edge(source_nodes_by_id[id_source], target_nodes_by_id[id_target], label=edge_label)
+            try:
+                self.logger.debug(f'{source_nodes_by_id[id_source]} -> {target_nodes_by_id[id_target]}')
+                if preceding:
+                    self.G.add_edge(target_nodes_by_id[id_target], source_nodes_by_id[id_source], label=edge_label)
+                else:
+                    self.G.add_edge(source_nodes_by_id[id_source], target_nodes_by_id[id_target], label=edge_label)
+            except Exception:
+                self.logger.error(f'missins {id_source} {id_target}')
 
         target_df.apply(add_edge, axis=1)
