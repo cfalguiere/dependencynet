@@ -3,10 +3,10 @@ import nox
 
 @nox.session
 def tests(session):
-    session.install('pytest', 'testfixtures')
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
     session.install('--quiet', '-r', 'requirements.txt')
     session.install('-e', '.')
-    session.run('pytest')
+    session.run('pytest', '--cov-report', 'term', '--cov=dependencynet')
 
 
 @nox.session
