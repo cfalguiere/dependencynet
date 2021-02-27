@@ -14,8 +14,21 @@ class StyleBuilder():
         self.graph_style = None
         self.levels_colors = ['#BBD4EF', '#CBE4FF', '#DBF4FF']
         self.colors = {
-            'red': '#F9D8D6', 'orange': '#F9EBDF', 'yellow': '#Eff9DA',
-            'green': '#CDF5F6', 'blue': '#CBE4F9', 'purple': '#D6CDEA',
+            '1': '#F9EBDF',
+            '2': '#b5dce1',
+            '3': '#cfdaf0',
+            '4': '#f4e3c9',
+            '5': '#d7e0b1',
+            '6': '#cecfe3',
+            '7': '#CBE4F9',
+            '8': '#d0e5d2',
+            '9': '#D6CDEA',
+            '10': '#f4e0e9',
+            '11': '#CDF5F6',
+            '12': '#d6cdc8',
+            '13': '#Eff9DA',
+            '14': '#f4d9d0',
+            '15': '#c9d0e2'
             }
 
     def style_template():
