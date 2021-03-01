@@ -1,4 +1,4 @@
-"""
+"missinqs""
 This module provides helpers to setup the graph network
 """
 import logging
@@ -328,6 +328,6 @@ class GraphBuilder():
                 else:
                     self.G.add_edge(source_nodes_by_id[id_source], target_nodes_by_id[id_target], label=edge_label)
             except Exception:
-                self.logger.error(f'missins {id_source} {id_target}')
+                self.logger.error(f'missing {id_source} {id_target}')
 
         target_df.apply(add_edge, axis=1)
