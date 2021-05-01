@@ -1,0 +1,6 @@
+pandas
+networkx
+ipycytoscape
+pyyed
+beautifulsoup4
+lxml
