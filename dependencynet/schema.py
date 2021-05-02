@@ -72,6 +72,8 @@ class SchemaBuilder:
         # TODO:  consistent wording for column labels and ids
         # TODO check whether columns exists and are inpout output
         # TODO structure for name, left, right
+        self.resources[left_key]['match_key'] = right_key
+        self.resources[right_key]['match_key'] = left_key
         self.connections.append((left_key, right_key))
         return self
 
