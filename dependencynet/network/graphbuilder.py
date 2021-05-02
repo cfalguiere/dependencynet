@@ -1,4 +1,4 @@
-"missinqs""
+"""
 This module provides helpers to setup the graph network
 """
 import logging
@@ -33,17 +33,24 @@ class ResourceNode(CustomNode):
 class InputNode(ResourceNode):
     def __init__(self, properties, category, connect_id_name):
         super().__init__(properties, f'{category} input')
-        self.data['category'] = category  # override FIXMZ role in concat
+        self.data['category'] = category  # override FIXME role in concat
         self.data['role'] = 'input'
         self.data['connect_id'] = properties[connect_id_name]
 
+    def setConnectId(self, left_id, right_id):
+        self.data['connect_id'] = f'{left_id}-{right_id}'
 
+
+# FIXMZ facto connect node
 class OutputNode(ResourceNode):
     def __init__(self, properties, category, connect_id_name):
         super().__init__(properties, f'{category} output')
-        self.data['category'] = category   # override FIXMZ role in concat
+        self.data['category'] = category   # override FIXME role in concat
         self.data['role'] = 'output'
         self.data['connect_id'] = properties[connect_id_name]
+
+    def setConnectId(self, left_id, right_id):
+        self.data['connect_id'] = f'{left_id}-{right_id}'
 
 
 class GraphModel():
@@ -246,18 +253,20 @@ class GraphBuilder():
         for key in self.model.schema.resources_keys():
             self.logger.info(f'adding resource nodes {key}')
             self.add_nodes_from_resource(key)
+
         for left, right in self.model.schema.connections_pairs():
             # FIXME no match - data id contains In or Out
             self.logger.info(f'adding connection {left} {right}')
             df = self.model.resource_dataset(right)
+            self.logger.debug(f'df columns: {df.columns}')
+            self.logger.debug(f'df : {df}')
             left_definition = self.model.schema.resource_definition(left)
-            right_definition = self.model.schema.resource_definition(right)
+            # right_definition = self.model.schema.resource_definition(right)
             # FIXME connect_id_name magic string
             # TODO insulate connection management and base class
-            self.add_edges_from(df, left, right,
-                                on_target_key=left_definition['connect_id_name'],
-                                on_source_key=right_definition['connect_id_name'],
-                                graph_key='connect_id')
+            self.logger.debug(f'resource_definition left: {left}')
+            self.logger.debug(f'resource_definition right: {right}')
+            self.add_connect_edges_from(df, left, right, left_definition['connect_id_name'])
 
     @classmethod
     def register_node_type(self, category, class_name, color='black'):
@@ -306,9 +315,16 @@ class GraphBuilder():
     def add_edges_from(self, target_df, source_category, target_category,
                        preceding=False, graph_key='id',
                        on_source_key='id_parent', on_target_key='id'):
+        self.logger.debug(f'add_edges_from target_df columns: {target_df.columns}')
+        self.logger.debug(f'add_edges_from target_df : {target_df}')
+        self.logger.debug(f'source_category : {source_category}')
+        self.logger.debug(f'target_category : {target_category}')
+        self.logger.debug(f'on_source_key : {on_source_key}')
+        self.logger.debug(f'on_target_key : {on_target_key}')
         source_nodes_by_id = {n.data[graph_key]: n for n in self.G.nodes() if source_category in n.classes}
         target_nodes_by_id = {n.data[graph_key]: n for n in self.G.nodes() if target_category in n.classes}
-        self.logger.debug(f'preceding={preceding}')
+        self.logger.debug(f'source_nodes_by_id : {source_nodes_by_id}')
+        self.logger.debug(f'target_nodes_by_id : {target_nodes_by_id}')
         # FIXME caller should swap parameters
         if preceding:
             edge_label = f'{target_category}_{source_category}'
@@ -317,17 +333,58 @@ class GraphBuilder():
         self.logger.debug(f'edge_label={edge_label}')
 
         def add_edge(row):
+            self.logger.debug(f'row {row}')
             id_source = row[on_source_key]
             id_target = row[on_target_key]
-            self.logger.debug(f'{id_source} -> {id_target}')
+            self.logger.debug(f'adding edge ids {id_source} -> {id_target}')
+            # fix connection id
             self.logger.debug(f'preceding={preceding}')
             try:
-                self.logger.debug(f'{source_nodes_by_id[id_source]} -> {target_nodes_by_id[id_target]}')
+                self.logger.debug(f'adding edge {source_nodes_by_id[id_source]} -> {target_nodes_by_id[id_target]}')
                 if preceding:
-                    self.G.add_edge(target_nodes_by_id[id_target], source_nodes_by_id[id_source], label=edge_label)
+                    self.G.add_edge(target_nodes_by_id[id_target],
+                                    source_nodes_by_id[id_source], label=edge_label)
                 else:
-                    self.G.add_edge(source_nodes_by_id[id_source], target_nodes_by_id[id_target], label=edge_label)
-            except Exception:
-                self.logger.error(f'missing {id_source} {id_target}')
-
+                    self.G.add_edge(source_nodes_by_id[id_source],
+                                    target_nodes_by_id[id_target], label=edge_label)
+                self.logger.debug(f'added edge {source_nodes_by_id[id_source]} -> {target_nodes_by_id[id_target]}')
+                try:
+                    for e in self.G.edges:
+                        self.logger.debug(f"{e[0].classes} {e[0].data['id']} -> {e[1].classes} {e[1].data['id']}")
+                except Exception as err:
+                    self.logger.error('error while logging : %s', err)
+            except Exception as err:
+                self.logger.error('add edge error : %s', err)
         target_df.apply(add_edge, axis=1)
+
+    @classmethod
+    def add_connect_edges_from(self, target_df, source_category,
+                               target_category, connect_category, on_key='connect_id'):
+        self.logger.debug(f'add_edges_from target_df columns: {target_df.columns}')
+        self.logger.debug(f'source_category : {source_category}')
+        self.logger.debug(f'target_category : {target_category}')
+        self.logger.debug(f'connect_category : {connect_category}')
+        edge_label = f'{source_category}_{target_category}'
+        self.logger.debug(f'edge_label={edge_label}')
+
+        def add_connect_edge(row):
+            self.logger.debug(f'row {row}')
+            id_connect = row[connect_category]
+            try:
+                source_nodes_by_id = {n.data['id']: n
+                                      for n in self.G.nodes()
+                                      if source_category in n.classes and n.data[on_key] == id_connect}
+                target_nodes_by_id = {n.data['id']: n
+                                      for n in self.G.nodes()
+                                      if target_category in n.classes and n.data[on_key] == id_connect}
+                self.logger.debug(f'source_nodes_by_id : {source_nodes_by_id}')
+                self.logger.debug(f'target_nodes_by_id {target_nodes_by_id}')
+
+                for t in target_nodes_by_id.values():
+                    for s in source_nodes_by_id.values():
+                        self.G.add_edge(s, t, label=edge_label)
+                        self.logger.debug(f'added edge {s} -> {t}')
+            except Exception as err:
+                self.logger.error('add edge error : %s', err)
+
+        target_df.apply(add_connect_edge, axis=1)
