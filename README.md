@@ -6,7 +6,17 @@ Dependency representation and analysis with graphs (networks)
 
 # Changelog
 
-# 0.1.5
+## 0.1.8
+Fix buf #2 PyYed generation failed if graph use connections
+
+## 0.1.7
+Fix bug #3 Missing links while using resources connections
+- now support links from one node to many nodes
+
+## 0.1.6
+minor fixes
+
+## 0.1.5
 New features:
 - allow to make a copy of a network in order to alter the copy
 - allow to add input/output role to resources and connect output to input
@@ -20,11 +30,11 @@ Some refactoring:
 - package datasource.loaders is now datasource.core
 - minor change of schema interface for input/output connections
 
-# 0.1.3 - 0.1.4
+## 0.1.3 - 0.1.4
 Bug fixes:
 - packaging issue (missing dependencies)
 
-# 0.1.2
+## 0.1.2
 New features:
 - allow to type resource as input / output
 - inputs are directed toward the node
