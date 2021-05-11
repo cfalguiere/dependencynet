@@ -83,6 +83,7 @@ class StyleBuilder():
         self.graph_style = self.style_template()
         i = 0
         for k in self.schema.levels_keys():
+            self.logger.info(f"adding level {k}")
             selecter = {
                             'selector': f'node.{k}',
                             'css': {
@@ -96,6 +97,7 @@ class StyleBuilder():
         i = 0
         for k in self.schema.resources_keys():
             bgcolor = list(self.colors.values())[i]
+            self.logger.info(f"adding resource {k}")
             selecter = {
                             'selector': f'node.{k}',
                             'css': {
@@ -108,6 +110,7 @@ class StyleBuilder():
 
         for (kl, kr) in self.schema.connections_pairs():
             k = self.schema.resource_definition(kl)['connect_id_name']
+            self.logger.info(f"adding connections {k}")
             bgcolor = list(self.colors.values())[i]
             selecter = {
                             'selector': f'node.{k}',

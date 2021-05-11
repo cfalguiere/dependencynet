@@ -34,6 +34,7 @@ class InputNode(ResourceNode):
     def __init__(self, properties, category, connect_id_name):
         super().__init__(properties, f'{category} input')
         self.data['category'] = category  # override FIXME role in concat
+        self.data['category_connect'] = connect_id_name
         self.data['role'] = 'input'
         self.data['connect_id'] = properties[connect_id_name]
 
@@ -45,7 +46,8 @@ class InputNode(ResourceNode):
 class OutputNode(ResourceNode):
     def __init__(self, properties, category, connect_id_name):
         super().__init__(properties, f'{category} output')
-        self.data['category'] = category   # override FIXME role in concat
+        self.data['category'] = category  # verride FIXME role in concat
+        self.data['category_connect'] = connect_id_name
         self.data['role'] = 'output'
         self.data['connect_id'] = properties[connect_id_name]
 
