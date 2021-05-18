@@ -6,8 +6,11 @@ Dependency representation and analysis with graphs (networks)
 
 # Changelog
 
+## 0.1.9
+Fix bug #8 GraphMl generation fail when nodes already exists
+
 ## 0.1.8
-Fix buf #2 PyYed generation failed if graph use connections
+Fix bug #2 PyYed generation failed if graph use connections
 
 ## 0.1.7
 Fix bug #3 Missing links while using resources connections
