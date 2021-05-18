@@ -77,14 +77,17 @@ class GraphMLConverter():
                 category = n.data['category_connect']
             self.logger.info(f"node {n}")
             self.logger.info(f"node category {category}")
-            g.add_node(n.data['id'],
-                       label=n.data['label'],
-                       shape=shapes[category],
-                       shape_fill=colors[category],
-                       font_size='8',
-                       font_style='bold',
-                       width=widths[category],
-                       height='30')
+            try:
+                g.add_node(n.data['id'],
+                           label=n.data['label'],
+                           shape=shapes[category],
+                           shape_fill=colors[category],
+                           font_size='8',
+                           font_style='bold',
+                           width=widths[category],
+                           height='30')
+            except RuntimeWarning as exc:
+                self.logger.warn(str(exc))
 
         for n1, n2 in self.graph_model.G.edges():
             self.logger.info(f"edge {n1}-{n2}")

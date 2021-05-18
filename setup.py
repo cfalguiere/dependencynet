@@ -9,7 +9,7 @@ setup(
                                     'dependencynet.network',
                                     'dependencynet.datasource',
                                     'dependencynet.datasource.core']),
-    version='0.1.8',
+    version='0.1.9',
     description='represent and analyse dependency graphs (networks)',
     long_description=long_description,
     long_description_content_type='text/markdown',
