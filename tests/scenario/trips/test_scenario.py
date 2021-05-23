@@ -45,17 +45,22 @@ def test_model_builder(model_trips):
 
     levels = ['area', 'country', 'town']
 
+    def has_levels(df, n=3):
+        return all(item in list(df.columns) for item in levels[0:n-1])
+
+    def has_resources(df, keys):
+        return all(item in list(df.columns) for item in keys)
+
     df_area = level_dfs[0]
     assert df_area.shape == (2, 4)
-    assert all(item in list(df_area.columns) for item in levels[0:0])
-    assert df_area['label'][4] == 'A02 Asia'
+    assert has_levels(df_area, 1)
     labels = df_area['label'].tolist()
     assert 'A01 Europe' in labels
     assert 'A02 Asia' in labels
 
     df_country = level_dfs[1]
     assert df_country.shape == (4, 6)
-    assert all(item in list(df_country.columns) for item in levels[0:1])
+    assert has_levels(df_country, 2)
     labels = df_country['label'].tolist()
     assert 'A01C01 France' in labels
     assert 'A01C02 UK' in labels
@@ -64,7 +69,7 @@ def test_model_builder(model_trips):
 
     df_town = level_dfs[2]
     assert df_town.shape == (5, 7)
-    assert all(item in list(df_town.columns) for item in levels)
+    assert has_levels(df_town)
     labels = df_town['label'].tolist()
     assert 'A01C01T01 Paris' in labels
     assert 'A01C01T02 Lyon' in labels
@@ -74,8 +79,8 @@ def test_model_builder(model_trips):
 
     df_flight_in = resource_dfs['flight_in']
     assert df_flight_in.shape == (4, 9)
-    assert all(item in list(df_flight_in.columns) for item in levels)
-    assert all(item in list(df_flight_in.columns) for item in ['flight_in', 'flight'])
+    assert has_levels(df_flight_in)
+    assert has_resources(df_flight_in, ['flight_in', 'flight'])
     labels = df_flight_in['label'].tolist()
     assert 'A01C01T01FIn01 fl2' in labels
     assert 'A01C02T01FIn01 fl4' in labels
@@ -84,8 +89,8 @@ def test_model_builder(model_trips):
 
     df_flight_out = resource_dfs['flight_out']
     assert df_flight_out.shape == (5, 9)
-    assert all(item in list(df_flight_out.columns) for item in levels)
-    assert all(item in list(df_flight_out.columns) for item in ['flight_out', 'flight'])
+    assert has_levels(df_flight_out)
+    assert has_resources(df_flight_out, ['flight_out', 'flight'])
     labels = df_flight_out['label'].tolist()
     assert 'A01C01T01FOut01 fl3' in labels
     assert 'A01C01T02FOut01 fl1' in labels
@@ -101,10 +106,10 @@ def test_graph_model(class_mapping_trips, model_trips):
     assert graph_model
 
     lines = graph_model.pretty_print()
+    assert len(lines) == 45
 
     # check connectionx out -> in on flights
     pattern = 'flight_out output resource %s -> flight_in input resource %s'
-    assert len(lines) == 45
     link1 = pattern % ('A01C01T01FOut01', 'A02C01T01FIn01')
     link2 = pattern % ('A01C01T02FOut01', 'A01C03T01FIn01')
     link3 = pattern % ('A01C03T01FOut01', 'A01C01T01FIn01')
