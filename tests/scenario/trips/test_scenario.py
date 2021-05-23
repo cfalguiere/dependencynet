@@ -70,6 +70,7 @@ def test_model_builder(model_trips):
 
 
 # Tests
+@pytest.mark.trips
 def test_graph_model(class_mapping_trips, model_trips):
     graph_model = GraphBuilder().with_types(class_mapping_trips).with_model(model_trips).render()
     assert graph_model

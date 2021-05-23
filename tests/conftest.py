@@ -43,25 +43,6 @@ def compact_columns_towns():
     return columns
 
 
-# ### Trips
-
-# (scope="session")
-@pytest.fixture
-def schema_trips():
-    schema = SchemaBuilder().level('area', 'A').level('country', 'C').level('town', 'T') \
-                              .resource('flight_in', 'FIn', role='INPUT', connect_id_name='flight') \
-                              .resource('flight_out', 'FOut', role='OUTPUT', connect_id_name='flight') \
-                              .connect('flight_out', 'flight_in') \
-                              .render()
-    return schema
-
-
-@pytest.fixture(scope="session")
-def compact_columns_trips():
-    columns = ['area', 'country', 'town', 'flight_in', 'flight_out']
-    return columns
-
-
 # ### Fanout
 
 @pytest.fixture
