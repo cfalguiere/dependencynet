@@ -1,5 +1,6 @@
 """
 Fixtures for trips
+purpose : connected flights over multiple towns
 The dataset has
 - 3 levels : Area, Country, Town
 - 2 resources: flight_in, flight_out

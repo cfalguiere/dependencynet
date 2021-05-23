@@ -17,10 +17,16 @@ def test_schema_builder(schema_trips):
     assert a_schema
     assert len(a_schema.levels['keys']) == 3
     assert len(a_schema.levels['marks']) == 3
+    assert a_schema.levels['keys'][0] == 'area'
+    assert a_schema.levels['marks'][0] == 'A'
     assert a_schema.levels['keys'][1] == 'country'
     assert a_schema.levels['marks'][1] == 'C'
+    assert a_schema.levels['keys'][2] == 'town'
+    assert a_schema.levels['marks'][2] == 'T'
     assert a_schema.resources['flight_in']['mark'] == 'FIn'
     assert a_schema.resources['flight_in']['explode'] is False
+    assert a_schema.resources['flight_out']['mark'] == 'FOut'
+    assert a_schema.resources['flight_out']['explode'] is False
 
     # FIXME tests connect
 
@@ -43,30 +49,49 @@ def test_model_builder(model_trips):
     assert df_area.shape == (2, 4)
     assert all(item in list(df_area.columns) for item in levels[0:0])
     assert df_area['label'][4] == 'A02 Asia'
+    labels = df_area['label'].tolist()
+    assert 'A01 Europe' in labels
+    assert 'A02 Asia' in labels
 
     df_country = level_dfs[1]
     assert df_country.shape == (4, 6)
     assert all(item in list(df_country.columns) for item in levels[0:1])
-    assert df_country['label'][2] == 'A01C03 Italia'
+    labels = df_country['label'].tolist()
+    assert 'A01C01 France' in labels
+    assert 'A01C02 UK' in labels
+    assert 'A01C03 Italia' in labels
+    assert 'A02C01 Japan' in labels
 
     df_town = level_dfs[2]
     assert df_town.shape == (5, 7)
     assert all(item in list(df_town.columns) for item in levels)
-    assert df_town['label'][1] == 'A01C01T02 Lyon'
+    labels = df_town['label'].tolist()
+    assert 'A01C01T01 Paris' in labels
+    assert 'A01C01T02 Lyon' in labels
+    assert 'A01C02T01 London' in labels
+    assert 'A01C03T01 Rome' in labels
+    assert 'A02C01T01 Tokyo' in labels
 
     df_flight_in = resource_dfs['flight_in']
     assert df_flight_in.shape == (4, 9)
-    i_paris = 0
     assert all(item in list(df_flight_in.columns) for item in levels)
     assert all(item in list(df_flight_in.columns) for item in ['flight_in', 'flight'])
-    assert df_flight_in['label'][i_paris] == 'A01C01T01FIn01 fl2'
+    labels = df_flight_in['label'].tolist()
+    assert 'A01C01T01FIn01 fl2' in labels
+    assert 'A01C02T01FIn01 fl4' in labels
+    assert 'A01C03T01FIn01 fl1' in labels
+    assert 'A02C01T01FIn01 fl3' in labels
 
     df_flight_out = resource_dfs['flight_out']
     assert df_flight_out.shape == (5, 9)
-    i_paris = 0
     assert all(item in list(df_flight_out.columns) for item in levels)
     assert all(item in list(df_flight_out.columns) for item in ['flight_out', 'flight'])
-    assert df_flight_out['label'][i_paris] == 'A01C01T01FOut01 fl3'
+    labels = df_flight_out['label'].tolist()
+    assert 'A01C01T01FOut01 fl3' in labels
+    assert 'A01C01T02FOut01 fl1' in labels
+    assert 'A01C02T01FOut01 fl5' in labels
+    assert 'A01C03T01FOut01 fl2' in labels
+    assert 'A02C01T01FOut01 fl4' in labels
 
 
 # Tests
