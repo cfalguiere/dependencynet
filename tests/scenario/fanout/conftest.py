@@ -1,17 +1,39 @@
 """
-This module tests the graph model - test cases : connection one to many
+Fixtures for fanout
+purpose : one node to many nodes
+The dataset has
+- 3 levels : L1, L2, L3
+- 2 resources: RI, RO
+- R in/out are connected
 """
-# third party import
 import pytest
-
 from os import path
+
 import pandas as pd
 
+# module import
+from dependencynet.schema import SchemaBuilder
 from dependencynet.model import ModelBuilder
 
-# module import
-from dependencynet.network.graphbuilder import GraphBuilder, LevelNode
-from dependencynet.network.graphbuilder import InputNode, OutputNode
+from dependencynet.network.graphbuilder import LevelNode, InputNode, OutputNode
+
+
+@pytest.fixture
+def schema_fanout():
+    schema = SchemaBuilder().level('L1', 'L1') \
+                            .level('L2', 'L2') \
+                            .level('L3', 'L3') \
+                            .resource('RI', 'RI', role='INPUT', connect_id_name='R') \
+                            .resource('RO', 'RO', role='OUTPUT', connect_id_name='R') \
+                            .connect('RO', 'RI') \
+                            .render()
+    return schema
+
+
+@pytest.fixture(scope="session")
+def compact_columns_fanout():
+    columns = ['L1', 'L2', 'L3', 'RO', 'RI']
+    return columns
 
 
 @pytest.fixture
@@ -30,6 +52,14 @@ def model_fanout(source_data_fanout, schema_fanout):
                           .render()
     return model
 
+
+@pytest.fixture
+def class_mapping_fanout():
+    return {'L1': L1Node, 'L2': L2Node, 'L3': L3Node,
+            'RO': RONode, 'RI': RINode}
+
+
+# networkx classes
 
 class L1Node(LevelNode):
     def __init__(self, properties):
@@ -54,26 +84,3 @@ class RINode(InputNode):
 class RONode(OutputNode):
     def __init__(self, properties):
         super().__init__(properties, 'RO', 'R')
-
-
-@pytest.fixture
-def class_mapping_fanout():
-    return {'L1': L1Node, 'L2': L2Node, 'L3': L3Node,
-            'RO': RONode, 'RI': RINode}
-
-
-# Tests
-def test_graph_model(class_mapping_fanout, model_fanout):
-    graph_model = GraphBuilder().with_types(class_mapping_fanout).with_model(model_fanout).render()
-    assert graph_model
-
-    lines = graph_model.pretty_print()
-
-    # check connectionx out -> in on flights
-    assert len(lines) == 40
-    for i in [37, 38, 39]:
-        assert 'L101L201L301RO01' in lines[i]
-        linkA = 'L102L201L301RI01' in lines[i]
-        linkB = 'L103L201L301RI01' in lines[i]
-        linkC = 'L104L201L301RI01' in lines[i]
-        assert linkA or linkB or linkC

@@ -41,23 +41,3 @@ def schema_towns():
 def compact_columns_towns():
     columns = ['area', 'country', 'town', 'monument']
     return columns
-
-
-# ### Fanout
-
-@pytest.fixture
-def schema_fanout():
-    schema = SchemaBuilder().level('L1', 'L1') \
-                            .level('L2', 'L2') \
-                            .level('L3', 'L3') \
-                            .resource('RI', 'RI', role='INPUT', connect_id_name='R') \
-                            .resource('RO', 'RO', role='OUTPUT', connect_id_name='R') \
-                            .connect('RO', 'RI') \
-                            .render()
-    return schema
-
-
-@pytest.fixture(scope="session")
-def compact_columns_fanout():
-    columns = ['L1', 'L2', 'L3', 'RO', 'RI']
-    return columns
