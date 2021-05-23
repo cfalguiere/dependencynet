@@ -1,5 +1,6 @@
 import nox
 
+nox.options.sessions = ['lint', 'tests']
 
 @nox.session
 def tests(session):
@@ -19,3 +20,11 @@ def lint(session):
             '--ignore=E501,I202,F401,F841',
             '--show-source',
             '.', 'noxfile.py')
+
+
+@nox.session
+def tests_trips(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'trips')
