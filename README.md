@@ -6,6 +6,12 @@ Dependency representation and analysis with graphs (networks)
 
 # Changelog
 
+## 0.2.0-SNAASHOT
+Refactoring of core classes
+Tests refactoring
+Added full scenarios
+Lint and smoke test of notebooks
+
 ## 0.1.9
 Fix bug #8 GraphMl generation fail when nodes already exists
 
