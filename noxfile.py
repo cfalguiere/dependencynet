@@ -57,23 +57,39 @@ def lint_notebooks(session):
     #        './notebooks/')
     session.install('nblint')
     session.install('--quiet', '-r', 'requirements.txt')
-    session.run(
-            'nblint',
-            '--linter',
-            'pyflakes',
-            './notebooks/scenario/fanout/example-graphml-fanout.ipynb')
+
+    import os
+    for root, dirs, files in os.walk('./notebooks/'):
+        if 'output' not in root:
+            for name in files:
+                if name.endswith('.ipynb'):
+                    if 'checkpoint' not in name:
+                        filename = os.path.join(root, name)
+                        session.run(
+                                'nblint',
+                                '--linter',
+                                'pyflakes',
+                                filename)
+    # TODO ignore magic
 
 
 @nox.session
 def check_notebooks(session):
     session.install('nbconvert')
     session.install('--quiet', '-r', 'requirements.txt')
-    session.run(
-            'jupyter',
-            'nbconvert',
-            '--to',
-            'notebook',
-            '--execute',
-            '--output',
-            'output',
-            './notebooks/scenario/fanout/example-graphml-fanout.ipynb')
+    import os
+    for root, dirs, files in os.walk('./notebooks/'):
+        if 'output' not in root:
+            for name in files:
+                if name.endswith('.ipynb'):
+                    if 'checkpoint' not in name:
+                        filename = os.path.join(root, name)
+                        session.run(
+                                'jupyter',
+                                'nbconvert',
+                                '--to',
+                                'notebook',
+                                '--execute',
+                                '--output',
+                                'check',
+                                filename)
