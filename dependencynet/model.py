@@ -3,11 +3,11 @@ This module provides helpers to setup the data model
 """
 import logging
 
-from dependencynet.tree_model import TreeModelBuilder
-from dependencynet.datasource.core.resourcesloader import ResourcesLoader
-from dependencynet.datasource.core.levelsloader import LevelsLoader
-from dependencynet.datasource.core.modelstorage import ModelStorageService
-from dependencynet.datasource.core.modelprettyprinter import ModelPrettyPrinter
+from dependencynet.core.model.tree_model import TreeModelBuilder
+from dependencynet.core.datasource.resourcesloader import ResourcesLoader
+from dependencynet.core.datasource.levelsloader import LevelsLoader
+from dependencynet.core.datasource.modelstorage import ModelStorageService
+from dependencynet.core.datasource.modelprettyprinter import ModelPrettyPrinter
 
 
 class Model:

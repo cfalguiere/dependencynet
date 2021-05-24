@@ -98,6 +98,8 @@ def test_model_builder(model_trips):
     assert 'A01C03T01FOut01 fl2' in labels
     assert 'A02C01T01FOut01 fl4' in labels
 
+    return
+
 
 # Tests
 @pytest.mark.trips
