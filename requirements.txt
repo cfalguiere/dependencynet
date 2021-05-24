@@ -1,6 +1,7 @@
-pandas
-networkx
-ipycytoscape
-pyyed
-beautifulsoup4
-lxml
+beautifulsoup4 ==4.9.3
+ipycytoscape ==1.2.2
+lxml ==4.6.3
+matplotlib ==3.4.2
+networkx ==2.5.1
+pandas ==1.2.4
+pyyed ==1.4.3
