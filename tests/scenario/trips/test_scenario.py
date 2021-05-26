@@ -1,12 +1,13 @@
 """
 Tests model creation using the dataset trips
 TODO tests connect
-TODO test viewer, graphml, style builder
+TODO test viewer, graphml
 """
 import pytest
 
 # module import
 from dependencynet.network.graphbuilder import GraphBuilder
+from dependencynet.network.stylebuilder import StyleBuilder
 
 
 @pytest.mark.trips
@@ -120,6 +121,27 @@ def test_graph_model(class_mapping_trips, model_trips):
     assert link2 in lines
     assert link3 in lines
     assert link4 in lines
+
+
+def test_graphstyle(schema_trips, compact_columns_trips):
+    sb = StyleBuilder(schema_trips)
+    graph_style = sb.render()
+
+    selectors = [style['selector'] for style in graph_style]
+
+    # check whether each node type is represented
+    for element in compact_columns_trips:
+        selector = f'node.{element}'
+        assert selector in selectors
+        i = selectors.index(selector)
+        assert 'background-color' in graph_style[i]['css']
+        assert 'color' in graph_style[i]['css']
+
+    connect_selector = 'node.flight'
+    assert connect_selector in selectors
+    i = selectors.index(selector)
+    assert 'background-color' in graph_style[i]['css']
+    assert 'color' in graph_style[i]['css']
 
 
 """
