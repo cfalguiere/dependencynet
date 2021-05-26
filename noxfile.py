@@ -24,19 +24,27 @@ def lint(session):
 
 
 @nox.session
-def tests_trips(session):
-    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
-    session.install('--quiet', '-r', 'requirements.txt')
-    session.install('-e', '.')
-    session.run('pytest', '-m', 'trips')
-
-
-@nox.session
 def tests_fanout(session):
     session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
     session.install('--quiet', '-r', 'requirements.txt')
     session.install('-e', '.')
     session.run('pytest', '-m', 'fanout')
+
+
+@nox.session
+def tests_towns(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'towns')
+
+
+@nox.session
+def tests_trips(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'trips')
 
 
 @nox.session
