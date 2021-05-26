@@ -10,7 +10,7 @@ setup(
                                     'dependencynet.datasource',
                                     'dependencynet.datasource.core']),
     version='0.2.0-SNAPSHOT',
-    description='represent and analyse dependency graphs (networks)',
+    description='This module wraps some data and graph manipulation tools to help analyzing and building representations of directed graphs.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Claude Falguiere',
