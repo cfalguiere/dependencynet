@@ -89,7 +89,7 @@ class ModelBuilder():
         loader = LevelsLoader(self.schema, self.source_df)
         levels_datasets = loader.extract_all()
 
-        df_parent = levels_datasets[2]  # FIXME last item of list
+        df_parent = levels_datasets[-1]
 
         self.logger.debug('render getting datasets')
         loader = ResourcesLoader(self.schema, self.source_df, df_parent)

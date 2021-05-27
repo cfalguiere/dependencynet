@@ -50,41 +50,52 @@ class TreeModelBuilder():
     # ---- private
 
     @classmethod
+    def __add_resource(self, parent, res_name, groups):
+        logger.debug(f'adding resource {res_name}')
+        element_name = "%s_dict" % res_name
+        parent[element_name] = {}
+        for kr, vr in groups:
+            records = vr.to_dict('records')
+            parent[element_name][kr] = records[0]
+
+    @classmethod
+    def __add_resources(self, parent, parent_key):
+        resources_dfs = self.resources_datasets
+        if resources_dfs is not None:
+            logger.debug(f'adding {len(resources_dfs)} resources for {parent_key}')
+            for name, dfr in resources_dfs.items():
+                mask_parent_key = dfr['id_parent'] == parent_key
+                r = dfr[mask_parent_key].groupby('id')
+                self.__add_resource(parent, name, r)
+
+    @classmethod
+    def __add_level(self, current_level, parent, parent_key):
+        levels_dfs = self.levels_datasets
+        max_level = len(levels_dfs) - 1
+        keys = self.schema.levels_keys()
+
+        logger.debug(f'adding level {current_level} parent key {parent_key}')
+
+        element_name = "%s_dict" % keys[current_level]
+        parent[element_name] = {}
+        df = levels_dfs[current_level]
+        if current_level == 0:
+            level = levels_dfs[current_level].groupby('id')
+        else:
+            mask_parent_key = df['id_parent'] == parent_key
+            level = df[mask_parent_key].groupby('id')
+        for k, v in level:
+            records = v.to_dict('records')
+            parent[element_name][k] = records[0]
+
+            if current_level < max_level:
+                self.__add_level(current_level+1, parent[element_name][k], k)
+            else:
+                self.__add_resources(parent[element_name][k], k)
+
+    @classmethod
     def __build_tree(self, levels_dfs, keys, resources_dfs):
         tree = defaultdict(dict)
-        elt0_name = "%s_dict" % keys[0]
-        tree[elt0_name]
-
-        l0 = levels_dfs[0].groupby('id')
-        for k0, v0 in l0:
-            records = v0.to_dict('records')
-            tree[elt0_name][k0] = records[0]
-            elt1_name = "%s_dict" % keys[1]
-            tree[elt0_name][k0][elt1_name] = {}
-
-            df1 = levels_dfs[1]
-            l1 = df1[df1['id_parent'] == k0].groupby('id')
-            for k1, v1 in l1:
-                records = v1.to_dict('records')
-                tree[elt0_name][k0][elt1_name][k1] = records[0]
-                elt2_name = "%s_dict" % keys[2]
-                tree[elt0_name][k0][elt1_name][k1][elt2_name] = {}
-
-                df2 = levels_dfs[2]
-                l2 = df2[df2['id_parent'] == k1].groupby('id')
-                for k2, v2 in l2:
-                    records = v2.to_dict('records')
-                    tree[elt0_name][k0][elt1_name][k1][elt2_name][k2] = records[0]
-
-                    if resources_dfs is not None:
-                        parent_tree = tree[elt0_name][k0][elt1_name][k1][elt2_name][k2]
-                        logger.debug(f'{len(resources_dfs)}')
-                        for name, dfr in resources_dfs.items():
-                            r = dfr[dfr['id_parent'] == k2].groupby('id')
-                            eltr_name = "%s_dict" % name
-                            parent_tree[eltr_name] = {}
-                            for kr, vr in r:
-                                records = vr.to_dict('records')
-                                parent_tree[eltr_name][kr] = records[0]
+        self.__add_level(0, tree, None)
 
         return tree

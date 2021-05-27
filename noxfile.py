@@ -48,6 +48,15 @@ def tests_trips(session):
 
 
 @nox.session
+def tests_twolevels(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'twolevels')
+
+
+
+@nox.session
 def tests_notebooks(session):
     session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov', 'pytest-notebook')
     session.install('--quiet', '-r', 'requirements.txt')
