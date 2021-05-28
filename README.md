@@ -48,6 +48,9 @@ The graph production is done in 4 major steps
 
 TODO link to Yed
 
+## example
+TODO
+
 ## How to install
 
 To use this library please use
@@ -73,10 +76,13 @@ Thanks to the maintainers and contributors of these modules.
 
 ## Changelog
 
-### 0.2.0-SNAPSHOT
+### 0.2.0
+Fix bug #5 - I would like to be able to define any number of key levels 
+
 Refactoring of core classes
 Tests refactoring
-Added full scenarios
+Added integration tests for each sample dataset
+Added unit tests for StyleBuilder
 Lint and smoke test of notebooks
 
 ### 0.1.9
