@@ -10,7 +10,7 @@ import pandas as pd
 
 # module import
 from dependencynet.model import ModelBuilder
-from dependencynet.datasource.core.modelstorage import ModelStorageService
+from dependencynet.core.datasource.modelstorage import ModelStorageService
 
 
 @pytest.fixture

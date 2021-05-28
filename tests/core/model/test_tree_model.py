@@ -7,7 +7,7 @@ import pandas as pd
 
 # module import
 from dependencynet.model import ModelBuilder
-from dependencynet.tree_model import TreeModelBuilder
+from dependencynet.core.model.tree_model import TreeModelBuilder
 
 
 @pytest.fixture

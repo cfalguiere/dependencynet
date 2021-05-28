@@ -3,11 +3,11 @@ This module provides helpers to setup the data model
 """
 import logging
 
-from dependencynet.tree_model import TreeModelBuilder
-from dependencynet.datasource.core.resourcesloader import ResourcesLoader
-from dependencynet.datasource.core.levelsloader import LevelsLoader
-from dependencynet.datasource.core.modelstorage import ModelStorageService
-from dependencynet.datasource.core.modelprettyprinter import ModelPrettyPrinter
+from dependencynet.core.model.tree_model import TreeModelBuilder
+from dependencynet.core.datasource.resourcesloader import ResourcesLoader
+from dependencynet.core.datasource.levelsloader import LevelsLoader
+from dependencynet.core.datasource.modelstorage import ModelStorageService
+from dependencynet.core.datasource.modelprettyprinter import ModelPrettyPrinter
 
 
 class Model:
@@ -89,7 +89,7 @@ class ModelBuilder():
         loader = LevelsLoader(self.schema, self.source_df)
         levels_datasets = loader.extract_all()
 
-        df_parent = levels_datasets[2]  # FIXME last item of list
+        df_parent = levels_datasets[-1]
 
         self.logger.debug('render getting datasets')
         loader = ResourcesLoader(self.schema, self.source_df, df_parent)

@@ -5,7 +5,7 @@ import logging
 from os import path, makedirs
 import json
 
-from dependencynet.datasource.core.encoders import SchemaEncoder, TreeModelEncoder
+from dependencynet.core.datasource.encoders import SchemaEncoder, TreeModelEncoder
 
 
 class ModelStorageService:

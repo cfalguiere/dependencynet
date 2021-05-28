@@ -7,10 +7,10 @@ import pytest
 from os import path
 import pandas as pd
 
-from dependencynet.datasource.core.levelsloader import LevelsLoader
+from dependencynet.core.datasource.levelsloader import LevelsLoader
 
 # module import
-from dependencynet.datasource.core.resourcesloader import ResourcesLoader
+from dependencynet.core.datasource.resourcesloader import ResourcesLoader
 
 
 @pytest.fixture

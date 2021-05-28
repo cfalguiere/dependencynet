@@ -6,7 +6,7 @@ This module tests base classes encoders
 
 
 # module import
-from dependencynet.datasource.core.encoders import SchemaEncoder
+from dependencynet.core.datasource.encoders import SchemaEncoder
 
 
 # Tests

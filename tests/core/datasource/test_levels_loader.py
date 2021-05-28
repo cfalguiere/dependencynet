@@ -8,7 +8,7 @@ from os import path
 import pandas as pd
 
 # module import
-from dependencynet.datasource.core.levelsloader import LevelsLoader
+from dependencynet.core.datasource.levelsloader import LevelsLoader
 
 
 @pytest.fixture
