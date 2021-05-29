@@ -36,7 +36,7 @@ def compact_columns_trips():
 
 @pytest.fixture
 def source_data_trips(schema_trips, compact_columns_trips):
-    filename = path.join('tests', 'resources', 'data', 'compact', 'trips.csv')
+    filename = path.join('tests', 'scenario', 'trips', 'resources', 'trips.csv')
     data = pd.read_csv(filename, delimiter=';')
 
     df = pd.DataFrame(data, columns=compact_columns_trips)

@@ -36,7 +36,7 @@ def compact_columns_towns():
 
 @pytest.fixture
 def source_data_towns(schema_towns, compact_columns_towns):
-    filename = path.join('tests', 'resources', 'data', 'compact', 'towns.csv')
+    filename = path.join('tests', 'scenario', 'towns', 'resources', 'towns.csv')
     data = pd.read_csv(filename, delimiter=';')
 
     df = pd.DataFrame(data, columns=compact_columns_towns)

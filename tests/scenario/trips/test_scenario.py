@@ -1,7 +1,7 @@
 """
 Tests model creation using the dataset trips
-TODO tests connect
 TODO test viewer, graphml
+TODO test test_graph_model links level -> resource
 """
 import pytest
 
@@ -99,8 +99,6 @@ def test_model_builder(model_trips):
     assert 'A01C03T01FOut01 fl2' in labels
     assert 'A02C01T01FOut01 fl4' in labels
 
-    return
-
 
 # Tests
 @pytest.mark.trips
@@ -123,6 +121,7 @@ def test_graph_model(class_mapping_trips, model_trips):
     assert link4 in lines
 
 
+@pytest.mark.trips
 def test_graphstyle(schema_trips, compact_columns_trips):
     sb = StyleBuilder(schema_trips)
     graph_style = sb.render()

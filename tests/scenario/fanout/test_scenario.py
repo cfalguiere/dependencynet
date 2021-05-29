@@ -1,7 +1,7 @@
 """
 Tests model creation using the dataset trips
-TODO tests connect
 TODO test viewer, graphml
+TODO test test_graph_model links level -> resource
 """
 import pytest
 
@@ -116,6 +116,7 @@ def test_graph_model(class_mapping_fanout, model_fanout):
     assert link3 in lines
 
 
+@pytest.mark.fanout
 def test_graphstyle(schema_fanout, compact_columns_fanout):
     sb = StyleBuilder(schema_fanout)
     graph_style = sb.render()

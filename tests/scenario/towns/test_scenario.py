@@ -182,6 +182,7 @@ def test_graph_model(class_mapping_towns, model_towns):
     assert edge in lines
 
 
+@pytest.mark.towns
 def test_graphstyle(schema_towns, compact_columns_towns):
     sb = StyleBuilder(schema_towns)
     graph_style = sb.render()

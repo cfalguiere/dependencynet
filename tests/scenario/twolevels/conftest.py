@@ -1,8 +1,8 @@
 """
-Fixtures for trips
-purpose : levels and resource provided as a list of item in the column
+Fixtures for towns twolevels
+purpose : two levels and one resource
 The dataset has
-- 3 levels : Area, Country, Town
+- 2 levels : Country, Town
 - 1 resource: monument
 - explode list of monument in column monument
 """

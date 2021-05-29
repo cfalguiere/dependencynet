@@ -38,7 +38,7 @@ def compact_columns_fanout():
 
 @pytest.fixture
 def source_data_fanout(schema_fanout, compact_columns_fanout):
-    filename = path.join('tests', 'resources', 'data', 'compact', 'fanout.csv')
+    filename = path.join('tests', 'scenario', 'fanout', 'resources', 'fanout.csv')
     data = pd.read_csv(filename, delimiter=';')
 
     df = pd.DataFrame(data, columns=compact_columns_fanout)
