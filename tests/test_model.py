@@ -1,6 +1,7 @@
 # third party import
 import pytest
 
+import re
 from os import path
 import pandas as pd
 
@@ -45,28 +46,60 @@ def test_model_builder_towns(source_data_towns, schema_towns):
     assert len(level_dfs) == 3
     assert len(resource_dfs) == 1
 
+    levels = ['area', 'country', 'town']
+
+    def has_levels(df, n=3):
+        return all(item in list(df.columns) for item in levels[0:n-1])
+
+    def has_resources(df, keys):
+        return all(item in list(df.columns) for item in keys)
+
     df_area = level_dfs[0]
     assert df_area.shape == (2, 4)
-    assert list(df_area.columns) == ['area', 'pos', 'id', 'label']
-    assert df_area['label'][4] == 'A02 Asia'
+    assert has_levels(df_area, 1)
+    labels = df_area['label'].tolist()
+    assert 'A01 Europe' in labels
+    assert 'A02 Asia' in labels
 
     df_country = level_dfs[1]
     assert df_country.shape == (4, 6)
-    assert list(df_country.columns) == ['area', 'country', 'pos', 'id_parent', 'id', 'label']
-    assert df_country['label'][2] == 'A01C03 Italia'
+    assert has_levels(df_country, 2)
+    labels = df_country['label'].tolist()
+    assert 'A01C01 France' in labels
+    assert 'A01C02 UK' in labels
+    assert 'A01C03 Italia' in labels
+    assert 'A02C01 Japan' in labels
 
     df_town = level_dfs[2]
     assert df_town.shape == (5, 7)
-    assert list(df_town.columns) == ['area', 'country', 'town', 'pos', 'id_parent', 'id', 'label']
-    assert df_town['label'][1] == 'A01C01T02 Lyon'
+    assert has_levels(df_town)
+    labels = df_town['label'].tolist()
+    assert 'A01C01T01 Paris' in labels
+    assert 'A01C01T02 Lyon' in labels
+    assert 'A01C02T01 London' in labels
+    assert 'A01C03T01 Rome' in labels
+    assert 'A02C01T01 Tokyo' in labels
+
+    # WARNING order is not defined
+    def select(s):
+        return pattern.match(s)
+
+    def extract_label(s):
+        m = pattern.match(s)
+        return m.group(1)
 
     df_monument = resource_dfs['monument']
     assert df_monument.shape == (6, 8)
-    i_paris = 0
-    assert list(df_monument.columns) == ['area', 'country', 'town', 'monument', 'pos', 'id_parent', 'id', 'label']
-    assert df_monument['label'][i_paris] == 'A01C01T01M01 Eiffel Tower'
+    assert has_levels(df_monument)
+    assert has_resources(df_monument, ['monument'])
 
-    # TODO tester lyon sans monument
+    labels = df_monument['label'].tolist()
+    pattern = re.compile(r"A\d{2}C\d{2}T\d{2}M\d{2} (.+)")
+    selected = list(filter(pattern.match, labels))
+    names = sorted([extract_label(s) for s in selected])
+    assert names == sorted(['Eiffel Tower', 'Louvre Museum',
+                            'Tower Bridge', 'Tower of London',
+                            'Colosseum', 'Senso-ji'])
 
 
 # Tests

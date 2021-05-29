@@ -13,15 +13,18 @@ def test_schema_builder_towns():
                             .level('town', 'T') \
                             .resource('monument', 'M') \
                             .render()
-    # .resource('station', 'S') \  # FIXME  fixture is altered ?
 
     assert a_schema
     assert len(a_schema.levels['keys']) == 3
     assert len(a_schema.levels['marks']) == 3
+    assert a_schema.levels['keys'][0] == 'area'
+    assert a_schema.levels['marks'][0] == 'A'
     assert a_schema.levels['keys'][1] == 'country'
     assert a_schema.levels['marks'][1] == 'C'
+    assert a_schema.levels['keys'][2] == 'town'
+    assert a_schema.levels['marks'][2] == 'T'
     assert a_schema.resources['monument']['mark'] == 'M'
-    assert a_schema.resources['monument']['explode'] is False
+    assert a_schema.resources['monument']['explode'] is True
 
 
 # Tests

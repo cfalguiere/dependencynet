@@ -1,7 +1,7 @@
 """
 Tests model creation using the dataset trips
 TODO test viewer, graphml
-TODO test test_graph_model links level -> resource
+TODO test test_graph_model all node and links level -> resource
 """
 import pytest
 
@@ -109,16 +109,19 @@ def test_graph_model(class_mapping_trips, model_trips):
     lines = graph_model.pretty_print()
     assert len(lines) == 45
 
+    # assumes those have been tested by class test
+    # nodes area, country, towns, flight_in, Sflight_out
+    # edges area -> country, country -> town, town -> flight _in, town -> flight_out
+
+    # check edges
     # check connectionx out -> in on flights
     pattern = 'flight_out output resource %s -> flight_in input resource %s'
-    link1 = pattern % ('A01C01T01FOut01', 'A02C01T01FIn01')
-    link2 = pattern % ('A01C01T02FOut01', 'A01C03T01FIn01')
-    link3 = pattern % ('A01C03T01FOut01', 'A01C01T01FIn01')
-    link4 = pattern % ('A02C01T01FOut01', 'A01C02T01FIn01')
-    assert link1 in lines
-    assert link2 in lines
-    assert link3 in lines
-    assert link4 in lines
+    for pair in [('A01C01T01FOut01', 'A02C01T01FIn01'),
+                 ('A01C01T02FOut01', 'A01C03T01FIn01'),
+                 ('A01C03T01FOut01', 'A01C01T01FIn01'),
+                 ('A02C01T01FOut01', 'A01C02T01FIn01')]:
+        edge = pattern % pair
+        assert edge in lines
 
 
 @pytest.mark.trips
@@ -136,6 +139,7 @@ def test_graphstyle(schema_trips, compact_columns_trips):
         assert 'background-color' in graph_style[i]['css']
         assert 'color' in graph_style[i]['css']
 
+    # check connection
     connect_selector = 'node.flight'
     assert connect_selector in selectors
     i = selectors.index(selector)

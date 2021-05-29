@@ -1,9 +1,7 @@
 """
 Tests model creation using the dataset towns
 TODO test viewer, graphml
-TODO test test_graph_model links monument
-TODO test test_graph_model links level -> monument
-"""
+T"""
 import pytest
 
 import re
@@ -132,30 +130,17 @@ def test_graph_model(class_mapping_towns, model_towns):
 
     # check edges
     pattern = 'country level %s -> town level %s'
-    edge = pattern % ('C01', 'C01T01')
-    assert edge in lines
-    edge = pattern % ('C01', 'C01T02')
-    assert edge in lines
-    edge = pattern % ('C02', 'C02T01')
-    assert edge in lines
-    edge = pattern % ('C03', 'C03T01')
-    assert edge in lines
-    edge = pattern % ('C04', 'C04T01')
-    assert edge in lines
+    for pair in [('C01', 'C01T01'), ('C01', 'C01T02'),
+                 ('C02', 'C02T01'), ('C03', 'C03T01'), ('C04', 'C04T01')]:
+        edge = pattern % pair
+        assert edge in lines
 
     pattern = 'town level %s -> monument resource %s'
-    edge = pattern % ('C01T01', 'C01T01M01')
-    assert edge in lines
-    edge = pattern % ('C01T01', 'C01T01M02')
-    assert edge in lines
-    edge = pattern % ('C02T01', 'C02T01M01')
-    assert edge in lines
-    edge = pattern % ('C02T01', 'C02T01M02')
-    assert edge in lines
-    edge = pattern % ('C03T01', 'C03T01M01')
-    assert edge in lines
-    edge = pattern % ('C04T01', 'C04T01M01')
-    assert edge in lines
+    for pair in [('C01T01', 'C01T01M01'), ('C01T01', 'C01T01M02'),
+                 ('C02T01', 'C02T01M01'), ('C02T01', 'C02T01M02'),
+                 ('C03T01', 'C03T01M01'), ('C04T01', 'C04T01M01')]:
+        edge = pattern % pair
+        assert edge in lines
 
 
 @pytest.mark.twolevels

@@ -1,7 +1,7 @@
 """
 Tests model creation using the dataset trips
 TODO test viewer, graphml
-TODO test test_graph_model links level -> resource
+TODO test test_graph_model all node and links level -> resource
 """
 import pytest
 
@@ -105,15 +105,17 @@ def test_graph_model(class_mapping_fanout, model_fanout):
 
     lines = graph_model.pretty_print()
 
+    # assumes those have been tested by class test
+    # nodes L1, L2, L3, RI, RO
+    # edges L1 -> L2, L2 -> L3, L3 -> RI, L3 -> RO
+
     # check connectionx out -> in on flights
     pattern = 'RO output resource %s -> RI input resource %s'
-    assert len(lines) == 40
-    link1 = pattern % ('L101L201L301RO01', 'L102L201L301RI01')
-    link2 = pattern % ('L101L201L301RO01', 'L103L201L301RI01')
-    link3 = pattern % ('L101L201L301RO01', 'L104L201L301RI01')
-    assert link1 in lines
-    assert link2 in lines
-    assert link3 in lines
+    for pair in [('L101L201L301RO01', 'L102L201L301RI01'),
+                 ('L101L201L301RO01', 'L103L201L301RI01'),
+                 ('L101L201L301RO01', 'L104L201L301RI01')]:
+        edge = pattern % pair
+        assert edge in lines
 
 
 @pytest.mark.fanout
@@ -131,6 +133,7 @@ def test_graphstyle(schema_fanout, compact_columns_fanout):
         assert 'background-color' in graph_style[i]['css']
         assert 'color' in graph_style[i]['css']
 
+    # check connection
     connect_selector = 'node.R'
     assert connect_selector in selectors
     i = selectors.index(selector)
