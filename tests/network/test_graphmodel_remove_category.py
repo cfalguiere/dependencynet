@@ -9,6 +9,8 @@ TODO fix remove country or town with consistent edge remapping
 # third party import
 import pytest
 
+import re
+
 # module import
 from dependencynet.network.graphbuilder import GraphBuilder
 
@@ -23,6 +25,10 @@ def test_remove_category_area(class_mapping_towns, model_towns):
 
     lines = graph_model.pretty_print()
     assert len(lines) == 29
+
+    pattern = re.compile(r"area level - (.+)")
+    selected = list(filter(pattern.match, lines))
+    assert len(selected) == 0
 
     pattern_level_country = 'country level - %s'
     for value in ['A01C01 France', 'A01C02 UK', 'A01C03 Italia',
