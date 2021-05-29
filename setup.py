@@ -9,7 +9,7 @@ setup(
                                     'dependencynet.network',
                                     'dependencynet.datasource',
                                     'dependencynet.datasource.core']),
-    version='0.2.0',
+    version='0.2.1-SNAPSHOT',
     description='This module wraps some data and graph manipulation tools to help analyzing and building representations of directed graphs.',
     long_description=long_description,
     long_description_content_type='text/markdown',

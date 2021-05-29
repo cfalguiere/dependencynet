@@ -10,6 +10,7 @@ import pytest
 from dependencynet.network.graphbuilder import GraphBuilder
 
 
+@pytest.mark.graph_model
 @pytest.mark.trips
 def test_merge_connections(class_mapping_trips, model_trips):
     graph_model = GraphBuilder().with_types(class_mapping_trips).with_model(model_trips).render()
