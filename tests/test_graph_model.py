@@ -11,7 +11,6 @@ from dependencynet.network.graphbuilder import GraphBuilder
 
 
 # Tests
-@pytest.mark.towns
 def test_graph_model(class_mapping_towns, model_towns):
     graph_model = GraphBuilder().with_types(class_mapping_towns).with_model(model_towns).render()
     assert graph_model
