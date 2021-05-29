@@ -3,6 +3,7 @@ import nox
 nox.options.sessions = ['lint', 'tests']
 nox.options.reuse_existing_virtualenvs = True
 
+
 @nox.session
 def tests(session):
     session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
@@ -54,6 +55,13 @@ def tests_twolevels(session):
     session.install('-e', '.')
     session.run('pytest', '-m', 'twolevels')
 
+
+@nox.session
+def tests_graph_model(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'graph_model')
 
 
 @nox.session
