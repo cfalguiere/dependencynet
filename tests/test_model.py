@@ -112,21 +112,13 @@ def test_model_builder_field_not_found(source_data_towns, wrong_schema):
 
 
 # Tests
-def test_model_builder_towns_has_schema(source_data_towns, schema_towns):
-    model = ModelBuilder().from_compact(source_data_towns) \
-                          .with_schema(schema_towns) \
-                          .render()
-    assert model
-    assert model.schema
+def test_model_builder_towns_has_schema(model_towns):
+    assert model_towns.schema
 
 
 # Tests
-def test_pretty_print(source_data_towns, schema_towns):
-    model = ModelBuilder().from_compact(source_data_towns) \
-                          .with_schema(schema_towns) \
-                          .render()
-
-    lines = model.pretty_print()
+def test_pretty_print(model_towns):
+    lines = model_towns.pretty_print()
 
     assert len(lines) == 40
     assert lines[0] == 'there are 2 area(s)'

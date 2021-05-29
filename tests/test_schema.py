@@ -24,7 +24,7 @@ def test_schema_builder_towns():
     assert a_schema.levels['keys'][2] == 'town'
     assert a_schema.levels['marks'][2] == 'T'
     assert a_schema.resources['monument']['mark'] == 'M'
-    assert a_schema.resources['monument']['explode'] is True
+    assert a_schema.resources['monument']['explode'] is False
 
 
 # Tests

@@ -22,7 +22,7 @@ def logger():
     logger.setLevel(logging.DEBUG)
 
 
-@pytest.fixture()
+@pytest.fixture
 def root_location():
     with TempDirectory() as dir:
         yield dir
@@ -31,7 +31,7 @@ def root_location():
 # ### Towns
 
 # (scope="session")
-@pytest.fixture(scope="session")
+@pytest.fixture
 def schema_towns():
     schema = SchemaBuilder().level('area', 'A') \
                             .level('country', 'C') \
@@ -41,13 +41,13 @@ def schema_towns():
     return schema
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def compact_columns_towns():
     columns = ['area', 'country', 'town', 'monument']
     return columns
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def source_data_towns(schema_towns, compact_columns_towns):
     filename = path.join('tests', 'resources', 'data', 'compact', 'towns.csv')
     data = pd.read_csv(filename, delimiter=';')
@@ -56,7 +56,7 @@ def source_data_towns(schema_towns, compact_columns_towns):
     return df
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def model_towns(source_data_towns, schema_towns):
     model = ModelBuilder().from_compact(source_data_towns) \
                           .with_schema(schema_towns) \
@@ -84,6 +84,6 @@ class MonumentNode(ResourceNode):
         super().__init__(properties, 'monument')
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def class_mapping_towns():
     return {'area': AreaNode, 'country': CountryNode, 'town': TownNode, 'monument': MonumentNode}
