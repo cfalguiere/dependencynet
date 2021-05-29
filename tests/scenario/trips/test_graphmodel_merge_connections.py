@@ -30,11 +30,11 @@ def test_merge_connections_flight(class_mapping_trips, model_trips):
         node = pattern_level_flight % (value)
         assert node in lines
 
-    pattern = re.compile(r"flight_in resource  - (.+)")
+    pattern = re.compile(r"(.*)flight_in resource(.*)")
     selected = list(filter(pattern.match, lines))
     assert len(selected) == 0
 
-    pattern = re.compile(r"flight_out resource  - (.+)")
+    pattern = re.compile(r"(.*)flight_out resource(.*)")
     selected = list(filter(pattern.match, lines))
     assert len(selected) == 0
 

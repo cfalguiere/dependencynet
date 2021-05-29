@@ -37,7 +37,7 @@ def test_fold_categpry_flight(class_mapping_trips, model_trips):
         node = pattern_level_town % (value)
         assert node in lines
 
-    pattern = re.compile(r"flight resource  - (.+)")
+    pattern = re.compile(r"(.*)flight resource(.*)")
     selected = list(filter(pattern.match, lines))
     assert len(selected) == 0
 
@@ -69,7 +69,7 @@ def test_fold_categpry_town(class_mapping_trips, model_trips):
         node = pattern_level_flight % (value)
         assert node in lines
 
-    pattern = re.compile(r"town level  - (.+)")
+    pattern = re.compile(r"(.*)town level(.*)")
     selected = list(filter(pattern.match, lines))
     assert len(selected) == 0
 

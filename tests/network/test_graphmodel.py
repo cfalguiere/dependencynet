@@ -1,8 +1,6 @@
 """
 This module tests the graph model
 TODO
-    def aggregate_level(self, levels_list):
-    def fold_category(self, category, hide_inner=False):
     def summary(self):
 
 """
@@ -80,3 +78,19 @@ def test_graph_model(class_mapping_towns, model_towns):
                  ('A02C01T01', 'A02C01T01M01')]:
         edge = pattern % pair
         assert edge in lines
+
+
+@pytest.mark.graph_model
+def test_summary(class_mapping_towns, model_towns):
+    graph_model = GraphBuilder().with_types(class_mapping_towns).with_model(model_towns).render()
+    assert graph_model
+
+    counts = graph_model.summary()
+
+    print(counts)
+
+    assert counts['area level'] == 2
+    assert counts['country level'] == 4
+    assert counts['town level'] == 5
+
+    assert counts['monument resource'] == 6

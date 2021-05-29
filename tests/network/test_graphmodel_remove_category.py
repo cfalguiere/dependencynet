@@ -1,5 +1,5 @@
 """
-This module tests the feature remove category of the graph model
+This module tests the feature remove_category of the graph model
 after remove_category nodes of the type pass as parameter are removed
 edges from this node are removed accordingly
 limitation : can only remove upper level or levels
@@ -27,6 +27,10 @@ def test_remove_category_area(class_mapping_towns, model_towns):
     assert len(lines) == 29
 
     pattern = re.compile(r"area level - (.+)")
+    selected = list(filter(pattern.match, lines))
+    assert len(selected) == 0
+
+    pattern = re.compile(r"(.*)area level(.*)")
     selected = list(filter(pattern.match, lines))
     assert len(selected) == 0
 
@@ -73,6 +77,14 @@ def xtest_remove_category_area_country(class_mapping_towns, model_towns):
 
     lines = graph_model.pretty_print()
     assert len(lines) == 22
+
+    pattern = re.compile(r"(.*)area level(.*)")
+    selected = list(filter(pattern.match, lines))
+    assert len(selected) == 0
+
+    pattern = re.compile(r"(.*)country level(.*)")
+    selected = list(filter(pattern.match, lines))
+    assert len(selected) == 0
 
     pattern_level_town = 'town level - %s'
     for value in ['A01C01T01 Paris', 'A01C01T02 Lyon',
