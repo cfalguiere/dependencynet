@@ -2,7 +2,7 @@
 This module tests base classes encoders
 """
 # third party import
-# import pytest
+import pytest
 
 
 # module import
@@ -10,6 +10,7 @@ from dependencynet.core.datasource.encoders import SchemaEncoder
 
 
 # Tests
+@pytest.mark.core
 def test_schema_encoder(schema_towns):
     encoded = SchemaEncoder().encode(schema_towns)
 

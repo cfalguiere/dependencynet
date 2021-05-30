@@ -25,6 +25,7 @@ def source_data_towns(schema_towns, compact_columns_towns):
 
 
 # Tests
+@pytest.mark.core
 def test_model_storage_towns(source_data_towns, schema_towns, root_location):
     model = ModelBuilder().from_compact(source_data_towns) \
                           .with_schema(schema_towns) \

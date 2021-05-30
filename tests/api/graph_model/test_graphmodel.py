@@ -1,8 +1,5 @@
 """
 This module tests the graph model
-TODO
-    def summary(self):
-
 """
 # third party import
 import pytest

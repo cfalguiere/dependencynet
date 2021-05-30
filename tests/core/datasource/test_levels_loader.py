@@ -23,6 +23,7 @@ def source_data_towns(schema_towns, compact_columns_towns):
 
 
 # Tests
+@pytest.mark.core
 def test_area_country_town_loader_towns(source_data_towns, schema_towns):
     loader = LevelsLoader(schema_towns, source_data_towns)
     level_dfs = loader.extract_all()

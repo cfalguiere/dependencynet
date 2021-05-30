@@ -25,6 +25,7 @@ def source_data_towns(schema_towns, compact_columns_towns):
 
 
 # Tests
+@pytest.mark.core
 def test_resources_loader_towns(source_data_towns, schema_towns):
     loader = LevelsLoader(schema_towns, source_data_towns)
     print(loader)
@@ -43,6 +44,7 @@ def test_resources_loader_towns(source_data_towns, schema_towns):
 
 
 # Tests
+@pytest.mark.core
 def test_monument_loader_towns(source_data_towns, schema_towns):
     loader = LevelsLoader(schema_towns, source_data_towns)
     levels_datasets = loader.extract_all()

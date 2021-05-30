@@ -1,4 +1,5 @@
 # third party import
+import pytest
 
 # module import
 from dependencynet.schema import SchemaBuilder
@@ -7,6 +8,7 @@ from dependencynet.schema import SchemaBuilder
 
 
 # Tests
+@pytest.mark.schema
 def test_schema_builder_towns():
     a_schema = SchemaBuilder().level('area', 'A') \
                             .level('country', 'C') \
@@ -28,6 +30,7 @@ def test_schema_builder_towns():
 
 
 # Tests
+@pytest.mark.schema
 def test_schema_builder_explode_towns():
     a_schema = SchemaBuilder().level('area', 'A') \
                             .level('country', 'C') \
@@ -40,6 +43,7 @@ def test_schema_builder_explode_towns():
 
 
 # Tests
+@pytest.mark.schema
 def test_schema_level_keys_towns(schema_towns):
     keys = schema_towns.levels_keys()
 
@@ -47,6 +51,7 @@ def test_schema_level_keys_towns(schema_towns):
 
 
 # Tests
+@pytest.mark.schema
 def test_schema_level_marks_towns(schema_towns):
     marks = schema_towns.levels_marks()
 
@@ -54,6 +59,7 @@ def test_schema_level_marks_towns(schema_towns):
 
 
 # Tests
+@pytest.mark.schema
 def test_schema_resource_keys_towns(schema_towns):
     keys = schema_towns.resources_keys()
 
@@ -61,6 +67,7 @@ def test_schema_resource_keys_towns(schema_towns):
 
 
 # Tests
+@pytest.mark.schema
 def test_schema_resource_mark_towns(schema_towns):
     mark = schema_towns.resource_mark('monument')
 
@@ -68,6 +75,7 @@ def test_schema_resource_mark_towns(schema_towns):
 
 
 # Tests
+@pytest.mark.schema
 def test_schema_resource_definition_towns(schema_towns):
     definition = schema_towns.resource_definition('monument')
     assert definition['explode'] is True

@@ -2,11 +2,13 @@
 This module tests the StyleBuilder
 """
 # third party import
+import pytest
 
 # module import
 from dependencynet.network.stylebuilder import StyleBuilder
 
 
+@pytest.mark.graph_style
 def test_graphstyle(schema_towns, compact_columns_towns):
     sb = StyleBuilder(schema_towns)
     graph_style = sb.render()

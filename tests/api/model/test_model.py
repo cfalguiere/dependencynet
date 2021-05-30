@@ -33,6 +33,7 @@ def wrong_schema():
 
 
 # Tests
+@pytest.mark.model
 def test_model_builder_towns(source_data_towns, schema_towns):
     model = ModelBuilder().from_compact(source_data_towns) \
                           .with_schema(schema_towns) \
@@ -103,6 +104,7 @@ def test_model_builder_towns(source_data_towns, schema_towns):
 
 
 # Tests
+@pytest.mark.model
 def test_model_builder_field_not_found(source_data_towns, wrong_schema):
     with pytest.raises(RuntimeError) as excinfo:
         mb = ModelBuilder()
@@ -112,11 +114,13 @@ def test_model_builder_field_not_found(source_data_towns, wrong_schema):
 
 
 # Tests
+@pytest.mark.model
 def test_model_builder_towns_has_schema(model_towns):
     assert model_towns.schema
 
 
 # Tests
+@pytest.mark.model
 def test_pretty_print(model_towns):
     lines = model_towns.pretty_print()
 

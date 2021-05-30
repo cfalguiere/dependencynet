@@ -24,6 +24,8 @@ def lint(session):
             '.', 'noxfile.py')
 
 
+# scenarios
+
 @nox.session
 def tests_fanout(session):
     session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
@@ -56,13 +58,51 @@ def tests_twolevels(session):
     session.run('pytest', '-m', 'twolevels')
 
 
+# api
+
 @nox.session
-def tests_graph_model(session):
+def tests_api_schema(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'schema')
+
+
+@nox.session
+def tests_api_model(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'model')
+
+
+@nox.session
+def tests_api_graph_model(session):
     session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
     session.install('--quiet', '-r', 'requirements.txt')
     session.install('-e', '.')
     session.run('pytest', '-m', 'graph_model')
 
+
+@nox.session
+def tests_api_graph_style(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'graph_style')
+
+
+# core functions
+
+@nox.session
+def tests_core(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'core')
+
+
+# notebooks
 
 @nox.session
 def tests_notebooks(session):

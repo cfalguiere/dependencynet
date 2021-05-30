@@ -30,6 +30,7 @@ def model_towns(source_data_towns, schema_towns):
 
 
 # Tests
+@pytest.mark.core
 def test_tree_model_towns(model_towns, schema_towns):
     # TODO resources
     tree_model = TreeModelBuilder().from_canonical(model_towns.levels_datasets, None) \
@@ -50,6 +51,7 @@ def test_tree_model_towns(model_towns, schema_towns):
 
 
 # Tests
+@pytest.mark.core
 def test_full_tree_model_towns(model_towns, schema_towns):
     # TODO resources
     tree_model = TreeModelBuilder().from_canonical(model_towns.levels_datasets,
