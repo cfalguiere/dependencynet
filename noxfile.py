@@ -92,6 +92,15 @@ def tests_api_graph_style(session):
     session.run('pytest', '-m', 'graph_style')
 
 
+@nox.session
+def tests_api_graphml(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'graphml')
+    # session.run('pytest', '--pyargs', 'tests.api.graphml')
+
+
 # core functions
 
 @nox.session
