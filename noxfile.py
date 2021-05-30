@@ -93,6 +93,14 @@ def tests_api_graph_style(session):
 
 
 @nox.session
+def tests_api_graph_viewer(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'graph_viewer')
+
+
+@nox.session
 def tests_api_graphml(session):
     session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
     session.install('--quiet', '-r', 'requirements.txt')
