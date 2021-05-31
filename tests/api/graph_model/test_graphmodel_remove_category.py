@@ -30,10 +30,6 @@ def test_remove_category_area(class_mapping_towns, model_towns):
     selected = list(filter(pattern.match, lines))
     assert len(selected) == 0
 
-    pattern = re.compile(r"(.*)area level(.*)")
-    selected = list(filter(pattern.match, lines))
-    assert len(selected) == 0
-
     pattern_level_country = 'country level - %s'
     for value in ['A01C01 France', 'A01C02 UK', 'A01C03 Italia',
                   'A02C01 Japan']:
@@ -67,8 +63,7 @@ def test_remove_category_area(class_mapping_towns, model_towns):
 
 # Tests
 @pytest.mark.graph_model
-def xtest_remove_category_area_country(class_mapping_towns, model_towns):
-    "cannot remove arbitrary level - edges are not set"
+def test_remove_category_area_country(class_mapping_towns, model_towns):
     graph_model = GraphBuilder().with_types(class_mapping_towns).with_model(model_towns).render()
     assert graph_model
 
@@ -76,7 +71,7 @@ def xtest_remove_category_area_country(class_mapping_towns, model_towns):
     graph_model.remove_category('country')
 
     lines = graph_model.pretty_print()
-    assert len(lines) == 22
+    assert len(lines) == 20
 
     pattern = re.compile(r"(.*)area level(.*)")
     selected = list(filter(pattern.match, lines))
