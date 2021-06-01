@@ -2,8 +2,8 @@
 Fixtures for
 purpose : connected flights over multiple towns
 The dataset has
-- 3 levels : Country, Town
-- 2 resources: monument, flight_in, flight_out
+- 2 levels : Country, Town
+- 3 resources: monument, flight_in, flight_out
 - flights in/out are connected
 """
 import pytest
