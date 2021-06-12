@@ -15,6 +15,18 @@ class CustomNode(ipycytoscape.Node):
         self.data['role'] = None
         self.classes = classes
 
+    def get_id(self):
+        return self.data['id']
+
+    def get_label(self):
+        return self.data['label']
+
+    def get_role(self):
+        return self.data['role']
+
+    def get_classes(self):
+        return self.classes
+
 
 class LevelNode(CustomNode):
     def __init__(self, properties, category):
@@ -243,7 +255,8 @@ class GraphBuilder():
     @classmethod
     def render(self):
         self.logger.debug('render graph data')
-        self.__build_from_schema()
+        if not self.model.is_empty:
+            self.__build_from_schema()
         return GraphModel(self.G)
 
     #  basic operations

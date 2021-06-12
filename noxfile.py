@@ -43,6 +43,14 @@ def tests_journey(session):
 
 
 @nox.session
+def tests_libs(session):
+    session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
+    session.install('--quiet', '-r', 'requirements.txt')
+    session.install('-e', '.')
+    session.run('pytest', '-m', 'libs')
+
+
+@nox.session
 def tests_towns(session):
     session.install('pytest', 'testfixtures', 'coverage', 'pytest-cov')
     session.install('--quiet', '-r', 'requirements.txt')

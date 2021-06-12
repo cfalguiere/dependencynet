@@ -18,6 +18,7 @@ class Model:
         self.levels_datasets = levels_datasets  # list
         self.resources_datasets = resources_datasets   # map
         self.tree_model = tree_model
+        self.is_empty = self.tree_model is None
 
     @classmethod
     def __repr__(self):
@@ -63,6 +64,20 @@ class Model:
         storage.save(self)
 
 
+class EmptyModel(Model):
+    @classmethod
+    def __init__(self, schema):
+        super().__init__(schema, None, None, None)
+
+    @classmethod
+    def __repr__(self):
+        return "<EmptyModel>"
+
+    @property
+    def schema(self):
+        return self.schema
+
+
 class ModelBuilder():
     logger = logging.getLogger(__name__)
 
@@ -70,12 +85,14 @@ class ModelBuilder():
     def __init__(self):
         self.source_df = None
         self.schema = None
+        self.is_empty = True
 
     @classmethod
     def from_compact(self, source_df):
         # TODI check whether mark is unique
         # TODO which is key
         self.source_df = source_df
+        self.is_empty = False
         return self
 
     @classmethod
@@ -85,6 +102,13 @@ class ModelBuilder():
 
     @classmethod
     def render(self):
+        if self.is_empty:
+            return EmptyModel(self.schema)
+        else:
+            return self.__render_model()
+
+    @classmethod
+    def __render_model(self):
         self.logger.debug('render getting levels')
         loader = LevelsLoader(self.schema, self.source_df)
         levels_datasets = loader.extract_all()
